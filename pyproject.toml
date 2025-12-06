@@ -1,0 +1,35 @@
+[project]
+name = "twikit"
+authors = [
+    {name = "d60"},
+]
+description = "Twitter API wrapper for python with **no API key required**."
+readme = "README.md"
+requires-python = ">=3.8"
+license = "MIT"
+dependencies = [
+    "beautifulsoup4",
+    "filetype",
+    "httpx[socks]",
+    "js2py-3-13",
+    "lxml",
+    "m3u8",
+    "pyotp",
+    "webvtt-py",
+]
+
+dynamic = ["version"]
+
+[project.urls]
+Homepage = "https://github.com/d60/twikit"
+Documentation = "https://twikit.readthedocs.io/en/latest/twikit.html"
+Repository = "https://github.com/d60/twikit.git"
+Issues = "https://github.com/d60/twikit/issues"
+
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.dynamic]
+version = {attr = "twikit.__version__"}
+readme = {file = ["README.md"], content-type = "text/markdown"}
