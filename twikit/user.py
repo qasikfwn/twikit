@@ -88,6 +88,7 @@ class User:
 
     def __init__(self, client: Client, data: dict) -> None:
         self._client = client
+        self._data = data
         legacy = data['legacy']
 
         self.id: str = data['rest_id']
