@@ -118,7 +118,7 @@ class User:
         self.following_count: int = legacy['friends_count']
         self.favourites_count: int = legacy['favourites_count']
         self.listed_count: int = legacy['listed_count']
-        self.media_count = legacy['media_count']
+        self.media_count: int = legacy['media_count']
         self.statuses_count: int = legacy['statuses_count']
         self.is_translator: bool = legacy['is_translator']
         self.translator_type: str = legacy['translator_type']
