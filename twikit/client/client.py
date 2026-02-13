@@ -600,7 +600,7 @@ class Client:
         with open(path, 'w', encoding='utf-8') as f:
             json.dump(self.get_cookies(), f)
 
-    def set_cookies(self, cookies: dict, clear_cookies: bool = False) -> None:
+    def set_cookies(self, cookies: dict[Any, Any], clear_cookies: bool = False) -> None:
         """
         Sets cookies.
         You can skip the login procedure by loading a saved cookies.
