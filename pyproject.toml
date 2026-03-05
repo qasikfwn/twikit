@@ -20,6 +20,14 @@ dependencies = [
 
 dynamic = ["version"]
 
+[dependency-groups]
+dev = [
+    "pytest>=8.3.5",
+    "pytest-asyncio>=0.24.0",
+    "python-dotenv>=1.0.1",
+    "respx>=0.22.0",
+]
+
 [project.urls]
 Homepage = "https://github.com/d60/twikit"
 Documentation = "https://twikit.readthedocs.io/en/latest/twikit.html"
@@ -33,3 +41,16 @@ build-backend = "setuptools.build_meta"
 [tool.setuptools.dynamic]
 version = {attr = "twikit.__version__"}
 readme = {file = ["README.md"], content-type = "text/markdown"}
+
+
+[tool.pytest.ini_options]
+addopts = [
+    "--import-mode=importlib",
+]
+strict = true
+testpaths = ["tests"]
+asyncio_mode = "auto"
+markers = ["live: Test against the actual twitter api with real credentials."]
+
+[tool.ruff]
+line-length = 100
