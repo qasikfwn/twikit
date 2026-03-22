@@ -56,8 +56,7 @@ from ..utils import (
     find_entry_by_type,
     httpx_transport_to_url
 )
-from ..x_client_transaction.utils import handle_x_migration
-from ..x_client_transaction import ClientTransaction
+from ..client_transaction import IClientTransaction
 from .gql import GQLClient
 from .v11 import V11Client
 
@@ -110,7 +109,7 @@ class Client:
         self.captcha_solver = captcha_solver
         if captcha_solver is not None:
             captcha_solver.client = self
-        self.client_transaction = ClientTransaction()
+        self.client_transaction = IClientTransaction()
 
         self._token = TOKEN
         self._user_id = None

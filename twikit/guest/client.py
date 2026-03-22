@@ -23,7 +23,7 @@ from ..errors import (
     Unauthorized
 )
 from ..utils import Result, find_dict, find_entry_by_type, httpx_transport_to_url
-from ..x_client_transaction import ClientTransaction
+from ..client_transaction import IClientTransaction
 from .tweet import Tweet
 from .user import User
 
@@ -94,7 +94,7 @@ class GuestClient:
         self._guest_token: str | None = None  # set when activate method is called
         self.gql = GQLClient(self)
         self.v11 = V11Client(self)
-        self.client_transaction = ClientTransaction()
+        self.client_transaction = IClientTransaction()
 
     async def request(
         self,
