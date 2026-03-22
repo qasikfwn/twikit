@@ -84,7 +84,7 @@ class Flow:
         self.guest_token = guest_token
         self.response = None
 
-    async def execute_task(self, *subtask_inputs, **kwargs) -> None:
+    async def execute_task(self, *subtask_inputs: Any, **kwargs: Any) -> None:
         response, _ = await self._client.v11.onboarding_task(
             self.guest_token, self.token, list(subtask_inputs), **kwargs
         )
@@ -108,7 +108,7 @@ class Flow:
         return self.response['subtasks'][0]['subtask_id']
 
 
-def find_dict(obj: list | dict, key: str | int, find_one: bool = False) -> list[Any]:
+def find_dict(obj: list[Any] | dict[Any, Any], key: str | int, find_one: bool = False) -> list[Any]:
     """
     Retrieves elements from a nested dictionary.
     """
@@ -162,7 +162,7 @@ def timestamp_to_datetime(timestamp: str) -> datetime:
     return datetime.strptime(timestamp, '%a %b %d %H:%M:%S %z %Y')
 
 
-def build_tweet_data(raw_data: dict) -> dict:
+def build_tweet_data(raw_data: dict[Any, Any]) -> dict[Any, Any]:
     return {
         **raw_data,
         'rest_id': raw_data['id'],
@@ -188,7 +188,7 @@ def build_tweet_data(raw_data: dict) -> dict:
     }
 
 
-def build_user_data(raw_data: dict) -> dict:
+def build_user_data(raw_data: dict[Any, Any]) -> dict[Any, Any]:
     return {
         **raw_data,
         'rest_id': raw_data['id'],
@@ -227,7 +227,7 @@ def build_user_data(raw_data: dict) -> dict:
     }
 
 
-def flatten_params(params: dict) -> dict:
+def flatten_params(params: dict[Any, Any]) -> dict[Any, Any]:
     flattened_params = {}
     for key, value in params.items():
         if isinstance(value, (list, dict)):

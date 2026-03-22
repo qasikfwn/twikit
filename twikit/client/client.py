@@ -94,7 +94,7 @@ class Client:
         proxy: str | None = None,
         captcha_solver: Capsolver | None = None,
         user_agent: str | None = None,
-        **kwargs,
+        **kwargs: Any,
     ) -> None:
         if 'proxies' in kwargs:
             message = (
@@ -128,8 +128,8 @@ class Client:
         url: str,
         auto_unlock: bool = True,
         raise_exception: bool = True,
-        **kwargs,
-    ) -> tuple[dict | Any, Response]:
+        **kwargs: Any,
+    ) -> tuple[Any | str | dict[Any, Any], Response]:
         ":meta private:"
         headers = kwargs.pop('headers', {})
 
@@ -210,11 +210,11 @@ class Client:
 
         return response_data, response
 
-    async def get(self, url, **kwargs) -> tuple[dict | Any, Response]:
+    async def get(self, url: str, **kwargs: Any) -> tuple[dict[Any, Any] | Any, Response]:
         ":meta private:"
         return await self.request('GET', url, **kwargs)
 
-    async def post(self, url, **kwargs) -> tuple[dict | Any, Response]:
+    async def post(self, url: str, **kwargs: Any) -> tuple[dict[Any, Any] | Any, Response]:
         ":meta private:"
         return await self.request('POST', url, **kwargs)
 
@@ -549,7 +549,7 @@ class Client:
                 return
         raise Exception('could not unlock the account.')
 
-    def get_cookies(self) -> dict:
+    def get_cookies(self) -> dict[str, str]:
         """
         Get the cookies.
         You can skip the login procedure by loading the saved cookies
@@ -1077,7 +1077,8 @@ class Client:
         self,
         media_id: str,
         alt_text: str | None = None,
-        sensitive_warning: list[Literal['adult_content', 'graphic_violence', 'other']] = None,
+        sensitive_warning: list[Literal['adult_content', 'graphic_violence', 'other']]
+        | None = None,
     ) -> Response:
         """
         Adds metadata to uploaded media.
@@ -1088,7 +1089,7 @@ class Client:
             The media id for which to create metadata.
         alt_text : :class:`str` | None, default=None
             Alternative text for the media.
-        sensitive_warning : list{'adult_content', 'graphic_violence', 'other'}
+        sensitive_warning : list{'adult_content', 'graphic_violence', 'other'} | None, default=None
             A list of sensitive content warnings for the media.
 
         Returns
@@ -1173,7 +1174,7 @@ class Client:
         community_id: str | None = None,
         share_with_followers: bool = False,
         is_note_tweet: bool = False,
-        richtext_options: list[dict] = None,
+        richtext_options: list[dict[Any, Any]] | None = None,
         edit_tweet_id: str | None = None,
     ) -> Tweet:
         """
@@ -1197,7 +1198,7 @@ class Client:
             - 'followers': Limits replies to followers only.
             - 'verified': Limits replies to verified accounts only.
             - 'mentioned': Limits replies to mentioned accounts only.
-        attachment_url : :class:`str`
+        attachment_url : :class:`str`, default=None
             URL of the tweet to be quoted.
         is_note_tweet : :class:`bool`, default=False
             If this option is set to True, tweets longer than 280 characters
@@ -1246,7 +1247,7 @@ class Client:
         .upload_media
         .create_poll
         """
-        media_entities = [
+        media_entities: list[dict[str, Any]] = [
             {'media_id': media_id, 'tagged_users': []} for media_id in (media_ids or [])
         ]
         limit_mode = None
@@ -1669,7 +1670,11 @@ class Client:
         return response
 
     async def _get_tweet_engagements(
-        self, tweet_id: str, count: int, cursor: str, f
+        self,
+        tweet_id: str,
+        count: int,
+        cursor: str,
+        f,
     ) -> Result[User]:
         """
         Base function to get tweet engagements.
@@ -2589,7 +2594,11 @@ class Client:
         return trend_data
 
     async def _get_user_friendship(
-        self, user_id: str, count: int, f, cursor: str | None
+        self,
+        user_id: str,
+        count: int,
+        f,
+        cursor: str | None,
     ) -> Result[User]:
         """
         Base function to get friendship.
@@ -2623,7 +2632,12 @@ class Client:
         )
 
     async def _get_user_friendship_2(
-        self, user_id: str, screen_name: str, count: int, f, cursor: str
+        self,
+        user_id: str,
+        screen_name: str,
+        count: int,
+        f,
+        cursor: str,
     ) -> Result[User]:
         response, _ = await f(user_id, screen_name, count, cursor)
         users = response['users']

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 from ..constants import (
     DOMAIN,
@@ -22,13 +22,14 @@ from ..utils import flatten_params, get_query_id
 if TYPE_CHECKING:
     from ..guest.client import GuestClient
     from .client import Client
+    from httpx import Response
 
     ClientType = Client | GuestClient
 
 
 class Endpoint:
     @staticmethod
-    def url(path):
+    def url(path: str) -> str:
         return f'https://{DOMAIN}/i/api/graphql/{path}'
 
     SEARCH_TIMELINE = url('flaR-PUMshxFWZWPNpq4zA/SearchTimeline')
@@ -114,12 +115,12 @@ class GQLClient:
     async def gql_get(
         self,
         url: str,
-        variables: dict,
-        features: dict | None = None,
-        headers: dict | None = None,
-        extra_params: dict | None = None,
-        **kwargs,
-    ):
+        variables: dict[str, Any],
+        features: dict[str, bool] | None = None,
+        headers: dict[str, str] | None = None,
+        extra_params: dict[Any, Any] | None = None,
+        **kwargs: Any,
+    ) -> tuple[dict[Any, Any] | Any, Response]:
         params = {'variables': variables}
         if features is not None:
             params['features'] = features
@@ -132,13 +133,13 @@ class GQLClient:
     async def gql_post(
         self,
         url: str,
-        variables: dict,
-        features: dict | None = None,
-        headers: dict | None = None,
-        extra_data: dict | None = None,
-        **kwargs,
-    ):
-        data = {'variables': variables, 'queryId': get_query_id(url)}
+        variables: dict[str, Any],
+        features: dict[str, bool] | None = None,
+        headers: dict[str, str] | None = None,
+        extra_data: dict[Any, Any] | None = None,
+        **kwargs: Any,
+    ) -> tuple[dict[Any, Any] | Any, Response]:
+        data: dict[str, Any] = {'variables': variables, 'queryId': get_query_id(url)}
         if features is not None:
             data['features'] = features
         if extra_data is not None:
@@ -148,7 +149,7 @@ class GQLClient:
         return await self.base.post(url, json=data, headers=headers, **kwargs)
 
     async def search_timeline(self, query: str, product: str, count: int, cursor: str | None):
-        variables = {
+        variables: dict[str, Any] = {
             'rawQuery': query,
             'count': count,
             'querySource': 'typed_query',
@@ -164,19 +165,19 @@ class GQLClient:
 
     async def create_tweet(
         self,
-        is_note_tweet,
-        text,
-        media_entities,
-        poll_uri,
-        reply_to,
-        attachment_url,
-        community_id,
-        share_with_followers,
-        richtext_options,
-        edit_tweet_id,
-        limit_mode,
+        is_note_tweet: bool,
+        text: str,
+        media_entities: list[dict[str, Any]],
+        poll_uri: str | None,
+        reply_to: str | None,
+        attachment_url: str | None,
+        community_id: str | None,
+        share_with_followers: bool,
+        richtext_options: list[dict[Any, Any]] | None,
+        edit_tweet_id: str | None,
+        limit_mode: str | None,
     ):
-        variables = {
+        variables: dict[str, Any] = {
             'tweet_text': text,
             'dark_request': False,
             'media': {'media_entities': media_entities, 'possibly_sensitive': False},
@@ -215,8 +216,10 @@ class GQLClient:
             features = FEATURES
         return await self.gql_post(endpoint, variables, features)
 
-    async def create_scheduled_tweet(self, scheduled_at, text, media_ids) -> str:
-        variables = {
+    async def create_scheduled_tweet(
+        self, scheduled_at: int, text: str, media_ids: list[str] | None
+    ):
+        variables: dict[str, Any] = {
             'post_tweet_request': {
                 'auto_populate_reply_metadata': False,
                 'status': text,
@@ -227,23 +230,23 @@ class GQLClient:
         }
         return await self.gql_post(Endpoint.CREATE_SCHEDULED_TWEET, variables)
 
-    async def delete_tweet(self, tweet_id):
-        variables = {'tweet_id': tweet_id, 'dark_request': False}
+    async def delete_tweet(self, tweet_id: str):
+        variables: dict[str, Any] = {'tweet_id': tweet_id, 'dark_request': False}
         return await self.gql_post(Endpoint.DELETE_TWEET, variables)
 
-    async def user_by_screen_name(self, screen_name):
-        variables = {'screen_name': screen_name, 'withSafetyModeUserFields': False}
+    async def user_by_screen_name(self, screen_name: str):
+        variables: dict[str, Any] = {'screen_name': screen_name, 'withSafetyModeUserFields': False}
         params = {'fieldToggles': {'withAuxiliaryUserLabels': False}}
         return await self.gql_get(
             Endpoint.USER_BY_SCREEN_NAME, variables, USER_FEATURES, extra_params=params
         )
 
-    async def user_by_rest_id(self, user_id):
-        variables = {'userId': user_id, 'withSafetyModeUserFields': True}
+    async def user_by_rest_id(self, user_id: str):
+        variables: dict[str, Any] = {'userId': user_id, 'withSafetyModeUserFields': True}
         return await self.gql_get(Endpoint.USER_BY_REST_ID, variables, USER_FEATURES)
 
-    async def tweet_detail(self, tweet_id, cursor):
-        variables = {
+    async def tweet_detail(self, tweet_id: str, cursor: str | None):
+        variables: dict[str, Any] = {
             'focalTweetId': tweet_id,
             'with_rux_injections': False,
             'includePromotedContent': True,
@@ -262,28 +265,32 @@ class GQLClient:
         variables = {'ascending': True}
         return await self.gql_get(Endpoint.FETCH_SCHEDULED_TWEETS, variables)
 
-    async def delete_scheduled_tweet(self, tweet_id):
+    async def delete_scheduled_tweet(self, tweet_id: str):
         variables = {'scheduled_tweet_id': tweet_id}
         return await self.gql_post(Endpoint.DELETE_SCHEDULED_TWEET, variables)
 
-    async def tweet_engagements(self, tweet_id, count, cursor, endpoint):
-        variables = {'tweetId': tweet_id, 'count': count, 'includePromotedContent': True}
+    async def tweet_engagements(self, tweet_id: str, count: int, cursor: str | None, endpoint: str):
+        variables: dict[str, Any] = {
+            'tweetId': tweet_id,
+            'count': count,
+            'includePromotedContent': True,
+        }
         if cursor is not None:
             variables['cursor'] = cursor
         return await self.gql_get(endpoint, variables, FEATURES)
 
-    async def retweeters(self, tweet_id, count, cursor):
+    async def retweeters(self, tweet_id: str, count: int, cursor: str | None):
         return await self.tweet_engagements(tweet_id, count, cursor, Endpoint.RETWEETERS)
 
-    async def favoriters(self, tweet_id, count, cursor):
+    async def favoriters(self, tweet_id: str, count: int, cursor: str | None):
         return await self.tweet_engagements(tweet_id, count, cursor, Endpoint.FAVORITERS)
 
-    async def bird_watch_one_note(self, note_id):
+    async def bird_watch_one_note(self, note_id: str):
         variables = {'note_id': note_id}
         return await self.gql_get(Endpoint.FETCH_COMMUNITY_NOTE, variables, COMMUNITY_NOTE_FEATURES)
 
-    async def _get_user_tweets(self, user_id, count, cursor, endpoint):
-        variables = {
+    async def _get_user_tweets(self, user_id: str, count: int, cursor: str | None, endpoint: str):
+        variables: dict[str, Any] = {
             'userId': user_id,
             'count': count,
             'includePromotedContent': True,
@@ -295,20 +302,20 @@ class GQLClient:
             variables['cursor'] = cursor
         return await self.gql_get(endpoint, variables, FEATURES)
 
-    async def user_tweets(self, user_id, count, cursor):
+    async def user_tweets(self, user_id: str, count: int, cursor: str | None):
         return await self._get_user_tweets(user_id, count, cursor, Endpoint.USER_TWEETS)
 
-    async def user_tweets_and_replies(self, user_id, count, cursor):
+    async def user_tweets_and_replies(self, user_id: str, count: int, cursor: str | None):
         return await self._get_user_tweets(user_id, count, cursor, Endpoint.USER_TWEETS_AND_REPLIES)
 
-    async def user_media(self, user_id, count, cursor):
+    async def user_media(self, user_id: str, count: int, cursor: str | None):
         return await self._get_user_tweets(user_id, count, cursor, Endpoint.USER_MEDIA)
 
-    async def user_likes(self, user_id, count, cursor):
+    async def user_likes(self, user_id: str, count: int, cursor: str | None):
         return await self._get_user_tweets(user_id, count, cursor, Endpoint.USER_LIKES)
 
-    async def user_highlights_tweets(self, user_id, count, cursor):
-        variables = {
+    async def user_highlights_tweets(self, user_id: str, count: int, cursor: str | None):
+        variables: dict[str, Any] = {
             'userId': user_id,
             'count': count,
             'includePromotedContent': True,
@@ -323,8 +330,8 @@ class GQLClient:
             self.base._base_headers,
         )
 
-    async def home_timeline(self, count, seen_tweet_ids, cursor):
-        variables = {
+    async def home_timeline(self, count: int, seen_tweet_ids: list[str] | None, cursor: str | None):
+        variables: dict[str, Any] = {
             'count': count,
             'includePromotedContent': True,
             'latestControlAvailable': True,
@@ -336,8 +343,10 @@ class GQLClient:
             variables['cursor'] = cursor
         return await self.gql_post(Endpoint.HOME_TIMELINE, variables, FEATURES)
 
-    async def home_latest_timeline(self, count, seen_tweet_ids, cursor):
-        variables = {
+    async def home_latest_timeline(
+        self, count: int, seen_tweet_ids: list[str] | None, cursor: str | None
+    ):
+        variables: dict[str, Any] = {
             'count': count,
             'includePromotedContent': True,
             'latestControlAvailable': True,
@@ -349,36 +358,36 @@ class GQLClient:
             variables['cursor'] = cursor
         return await self.gql_post(Endpoint.HOME_LATEST_TIMELINE, variables, FEATURES)
 
-    async def favorite_tweet(self, tweet_id):
+    async def favorite_tweet(self, tweet_id: str):
         variables = {'tweet_id': tweet_id}
         return await self.gql_post(Endpoint.FAVORITE_TWEET, variables)
 
-    async def unfavorite_tweet(self, tweet_id):
+    async def unfavorite_tweet(self, tweet_id: str):
         variables = {'tweet_id': tweet_id}
         return await self.gql_post(Endpoint.UNFAVORITE_TWEET, variables)
 
-    async def retweet(self, tweet_id):
-        variables = {'tweet_id': tweet_id, 'dark_request': False}
+    async def retweet(self, tweet_id: str):
+        variables: dict[str, Any] = {'tweet_id': tweet_id, 'dark_request': False}
         return await self.gql_post(Endpoint.CREATE_RETWEET, variables)
 
-    async def delete_retweet(self, tweet_id):
-        variables = {'source_tweet_id': tweet_id, 'dark_request': False}
+    async def delete_retweet(self, tweet_id: str):
+        variables: dict[str, Any] = {'source_tweet_id': tweet_id, 'dark_request': False}
         return await self.gql_post(Endpoint.DELETE_RETWEET, variables)
 
-    async def create_bookmark(self, tweet_id):
+    async def create_bookmark(self, tweet_id: str):
         variables = {'tweet_id': tweet_id}
         return await self.gql_post(Endpoint.CREATE_BOOKMARK, variables)
 
-    async def bookmark_tweet_to_folder(self, tweet_id, folder_id):
+    async def bookmark_tweet_to_folder(self, tweet_id: str, folder_id: str):
         variables = {'tweet_id': tweet_id, 'bookmark_collection_id': folder_id}
         return await self.gql_post(Endpoint.BOOKMARK_TO_FOLDER, variables)
 
-    async def delete_bookmark(self, tweet_id):
+    async def delete_bookmark(self, tweet_id: str):
         variables = {'tweet_id': tweet_id}
         return await self.gql_post(Endpoint.DELETE_BOOKMARK, variables)
 
-    async def bookmarks(self, count, cursor):
-        variables = {'count': count, 'includePromotedContent': True}
+    async def bookmarks(self, count: int, cursor: str | None):
+        variables: dict[str, Any] = {'count': count, 'includePromotedContent': True}
         features = FEATURES | {'graphql_timeline_v2_bookmark_timeline': True}
         if cursor is not None:
             variables['cursor'] = cursor
@@ -387,8 +396,8 @@ class GQLClient:
             Endpoint.BOOKMARKS, params=params, headers=self.base._base_headers
         )
 
-    async def bookmark_folder_timeline(self, count, cursor, folder_id):
-        variables = {
+    async def bookmark_folder_timeline(self, count: int, cursor: str | None, folder_id: str):
+        variables: dict[str, Any] = {
             'count': count,
             'includePromotedContent': True,
             'bookmark_collection_id': folder_id,
@@ -403,48 +412,57 @@ class GQLClient:
     async def delete_all_bookmarks(self):
         return await self.gql_post(Endpoint.BOOKMARKS_ALL_DELETE, {})
 
-    async def bookmark_folders_slice(self, cursor):
+    async def bookmark_folders_slice(self, cursor: str | Any):
         variables = {}
         if cursor is not None:
             variables['cursor'] = cursor
-        variables = {'variables': variables}
+        variables: dict[str, Any] = {'variables': variables}
         return await self.gql_get(Endpoint.BOOKMARK_FOLDERS_SLICE, variables)
 
-    async def edit_bookmark_folder(self, folder_id, name):
+    async def edit_bookmark_folder(self, folder_id: str, name: str):
         variables = {'bookmark_collection_id': folder_id, 'name': name}
         return await self.gql_post(Endpoint.EDIT_BOOKMARK_FOLDER, variables)
 
-    async def delete_bookmark_folder(self, folder_id):
+    async def delete_bookmark_folder(self, folder_id: str):
         variables = {'bookmark_collection_id': folder_id}
         return await self.gql_post(Endpoint.DELETE_BOOKMARK_FOLDER, variables)
 
-    async def create_bookmark_folder(self, name):
+    async def create_bookmark_folder(self, name: str):
         variables = {'name': name}
         return await self.gql_post(Endpoint.CREATE_BOOKMARK_FOLDER, variables)
 
-    async def _friendships(self, user_id, count, endpoint, cursor):
-        variables = {'userId': user_id, 'count': count, 'includePromotedContent': False}
+    async def _friendships(self, user_id: str, count: int, endpoint: str, cursor: str | None):
+        variables: dict[str, Any] = {
+            'userId': user_id,
+            'count': count,
+            'includePromotedContent': False,
+        }
         if cursor is not None:
             variables['cursor'] = cursor
         return await self.gql_get(endpoint, variables, FEATURES)
 
-    async def followers(self, user_id, count, cursor):
+    async def followers(self, user_id: str, count: int, cursor: str | None):
         return await self._friendships(user_id, count, Endpoint.FOLLOWERS, cursor)
 
-    async def blue_verified_followers(self, user_id, count, cursor):
+    async def blue_verified_followers(self, user_id: str, count: int, cursor: str | None):
         return await self._friendships(user_id, count, Endpoint.BLUE_VERIFIED_FOLLOWERS, cursor)
 
-    async def followers_you_know(self, user_id, count, cursor):
+    async def followers_you_know(self, user_id: str, count: int, cursor: str | None):
         return await self._friendships(user_id, count, Endpoint.FOLLOWERS_YOU_KNOW, cursor)
 
-    async def following(self, user_id, count, cursor):
+    async def following(self, user_id: str, count: int, cursor: str | None):
         return await self._friendships(user_id, count, Endpoint.FOLLOWING, cursor)
 
-    async def user_creator_subscriptions(self, user_id, count, cursor):
+    async def user_creator_subscriptions(self, user_id: str, count: int, cursor: str | None):
         return await self._friendships(user_id, count, Endpoint.USER_CREATOR_SUBSCRIPTIONS, cursor)
 
-    async def user_dm_reaction_mutation_add_mutation(self, message_id, conversation_id, emoji):
-        variables = {
+    async def user_dm_reaction_mutation_add_mutation(
+        self,
+        message_id: str,
+        conversation_id: str,
+        emoji: str,
+    ):
+        variables: dict[str, Any] = {
             'messageId': message_id,
             'conversationId': conversation_id,
             'reactionTypes': ['Emoji'],
@@ -452,8 +470,10 @@ class GQLClient:
         }
         return await self.gql_post(Endpoint.USER_DM_REACTION_MUTATION_ADD_MUTATION, variables)
 
-    async def user_dm_reaction_mutation_remove_mutation(self, message_id, conversation_id, emoji):
-        variables = {
+    async def user_dm_reaction_mutation_remove_mutation(
+        self, message_id: str, conversation_id: str, emoji: str
+    ):
+        variables: dict[str, Any] = {
             'conversationId': conversation_id,
             'messageId': message_id,
             'reactionTypes': ['Emoji'],
@@ -461,28 +481,34 @@ class GQLClient:
         }
         return await self.gql_post(Endpoint.USER_DM_REACTION_MUTATION_REMOVE_MUTATION, variables)
 
-    async def dm_message_delete_mutation(self, message_id):
+    async def dm_message_delete_mutation(self, message_id: str):
         variables = {'messageId': message_id}
         return await self.gql_post(Endpoint.DM_MESSAGE_DELETE_MUTATION, variables)
 
-    async def add_participants_mutation(self, group_id, user_ids):
-        variables = {'addedParticipants': user_ids, 'conversationId': group_id}
+    async def add_participants_mutation(self, group_id: str, user_ids: list[str]):
+        variables: dict[str, Any] = {'addedParticipants': user_ids, 'conversationId': group_id}
         return await self.gql_post(Endpoint.ADD_PARTICIPANTS_MUTATION, variables)
 
-    async def create_list(self, name, description, is_private):
-        variables = {'isPrivate': is_private, 'name': name, 'description': description}
+    async def create_list(self, name: str, description: str, is_private: bool):
+        variables: dict[str, Any] = {
+            'isPrivate': is_private,
+            'name': name,
+            'description': description,
+        }
         return await self.gql_post(Endpoint.CREATE_LIST, variables, LIST_FEATURES)
 
-    async def edit_list_banner(self, list_id, media_id):
+    async def edit_list_banner(self, list_id: str, media_id: str):
         variables = {'listId': list_id, 'mediaId': media_id}
         return await self.gql_post(Endpoint.EDIT_LIST_BANNER, variables, LIST_FEATURES)
 
-    async def delete_list_banner(self, list_id):
+    async def delete_list_banner(self, list_id: str):
         variables = {'listId': list_id}
         return await self.gql_post(Endpoint.DELETE_LIST_BANNER, variables, LIST_FEATURES)
 
-    async def update_list(self, list_id, name, description, is_private):
-        variables = {'listId': list_id}
+    async def update_list(
+        self, list_id: str, name: str | None, description: str | None, is_private: bool | None
+    ):
+        variables: dict[str, Any] = {'listId': list_id}
         if name is not None:
             variables['name'] = name
         if description is not None:
@@ -491,49 +517,49 @@ class GQLClient:
             variables['isPrivate'] = is_private
         return await self.gql_post(Endpoint.UPDATE_LIST, variables, LIST_FEATURES)
 
-    async def list_add_member(self, list_id, user_id):
+    async def list_add_member(self, list_id: str, user_id: str):
         variables = {'listId': list_id, 'userId': user_id}
         return await self.gql_post(Endpoint.LIST_ADD_MEMBER, variables, LIST_FEATURES)
 
-    async def list_remove_member(self, list_id, user_id):
+    async def list_remove_member(self, list_id: str, user_id: str):
         variables = {'listId': list_id, 'userId': user_id}
         return await self.gql_post(Endpoint.LIST_REMOVE_MEMBER, variables, LIST_FEATURES)
 
-    async def list_management_pace_timeline(self, count, cursor):
-        variables = {'count': count}
+    async def list_management_pace_timeline(self, count: int, cursor: str | None):
+        variables: dict[str, Any] = {'count': count}
         if cursor is not None:
             variables['cursor'] = cursor
         return await self.gql_get(Endpoint.LIST_MANAGEMENT_PACE_TIMELINE, variables, FEATURES)
 
-    async def list_by_rest_id(self, list_id):
+    async def list_by_rest_id(self, list_id: str):
         variables = {'listId': list_id}
         return await self.gql_get(Endpoint.LIST_BY_REST_ID, variables, LIST_FEATURES)
 
-    async def list_latest_tweets_timeline(self, list_id, count, cursor):
-        variables = {'listId': list_id, 'count': count}
+    async def list_latest_tweets_timeline(self, list_id: str, count: int, cursor: str | None):
+        variables: dict[str, Any] = {'listId': list_id, 'count': count}
         if cursor is not None:
             variables['cursor'] = cursor
         return await self.gql_get(Endpoint.LIST_LATEST_TWEETS_TIMELINE, variables, FEATURES)
 
-    async def _list_users(self, endpoint, list_id, count, cursor):
-        variables = {'listId': list_id, 'count': count}
+    async def _list_users(self, endpoint: str, list_id: str, count: int, cursor: str | None):
+        variables: dict[str, Any] = {'listId': list_id, 'count': count}
         if cursor is not None:
             variables['cursor'] = cursor
         return await self.gql_get(endpoint, variables, FEATURES)
 
-    async def list_members(self, list_id, count, cursor):
+    async def list_members(self, list_id: str, count: int, cursor: str | Any):
         return await self._list_users(Endpoint.LIST_MEMBERS, list_id, count, cursor)
 
-    async def list_subscribers(self, list_id, count, cursor):
+    async def list_subscribers(self, list_id: str, count: int, cursor: str | None):
         return await self._list_users(Endpoint.LIST_SUBSCRIBERS, list_id, count, cursor)
 
-    async def search_community(self, query, cursor):
+    async def search_community(self, query: str, cursor: str | None):
         variables = {'query': query}
         if cursor is not None:
             variables['cursor'] = cursor
         return await self.gql_get(Endpoint.SEARCH_COMMUNITY, variables)
 
-    async def community_query(self, community_id):
+    async def community_query(self, community_id: str):
         variables = {'communityId': community_id}
         features = {
             'c9s_list_members_action_api_enabled': False,
@@ -541,16 +567,22 @@ class GQLClient:
         }
         return await self.gql_get(Endpoint.COMMUNITY_QUERY, variables, features)
 
-    async def community_media_timeline(self, community_id, count, cursor):
-        variables = {'communityId': community_id, 'count': count, 'withCommunity': True}
+    async def community_media_timeline(self, community_id: str, count: int, cursor: str | None):
+        variables: dict[str, Any] = {
+            'communityId': community_id,
+            'count': count,
+            'withCommunity': True,
+        }
         if cursor is not None:
             variables['cursor'] = cursor
         return await self.gql_get(
             Endpoint.COMMUNITY_MEDIA_TIMELINE, variables, COMMUNITY_TWEETS_FEATURES
         )
 
-    async def community_tweets_timeline(self, community_id, ranking_mode, count, cursor):
-        variables = {
+    async def community_tweets_timeline(
+        self, community_id: str, ranking_mode: str, count: int, cursor: str | None
+    ):
+        variables: dict[str, Any] = {
             'communityId': community_id,
             'count': count,
             'withCommunity': True,
@@ -562,47 +594,53 @@ class GQLClient:
             Endpoint.COMMUNITY_TWEETS_TIMELINE, variables, COMMUNITY_TWEETS_FEATURES
         )
 
-    async def communities_main_page_timeline(self, count, cursor):
-        variables = {'count': count, 'withCommunity': True}
+    async def communities_main_page_timeline(self, count: int, cursor: str | None):
+        variables: dict[str, Any] = {'count': count, 'withCommunity': True}
         if cursor is not None:
             variables['cursor'] = cursor
         return await self.gql_get(
             Endpoint.COMMUNITIES_MAIN_PAGE_TIMELINE, variables, COMMUNITY_TWEETS_FEATURES
         )
 
-    async def join_community(self, community_id):
+    async def join_community(self, community_id: str):
         variables = {'communityId': community_id}
         return await self.gql_post(Endpoint.JOIN_COMMUNITY, variables, JOIN_COMMUNITY_FEATURES)
 
-    async def leave_community(self, community_id):
+    async def leave_community(self, community_id: str):
         variables = {'communityId': community_id}
         return await self.gql_post(Endpoint.LEAVE_COMMUNITY, variables, JOIN_COMMUNITY_FEATURES)
 
-    async def request_to_join_community(self, community_id, answer):
+    async def request_to_join_community(self, community_id: str, answer: str | None):
         variables = {'communityId': community_id, 'answer': '' if answer is None else answer}
         return await self.gql_post(
             Endpoint.REQUEST_TO_JOIN_COMMUNITY, variables, JOIN_COMMUNITY_FEATURES
         )
 
-    async def _get_community_users(self, endpoint, community_id, count, cursor):
-        variables = {'communityId': community_id, 'count': count}
+    async def _get_community_users(
+        self, endpoint: str, community_id: str, count: int, cursor: str | None
+    ):
+        variables: dict[str, Any] = {'communityId': community_id, 'count': count}
         features = {'responsive_web_graphql_timeline_navigation_enabled': True}
         if cursor is not None:
             variables['cursor'] = cursor
         return await self.gql_get(endpoint, variables, features)
 
-    async def members_slice_timeline_query(self, community_id, count, cursor):
+    async def members_slice_timeline_query(self, community_id: str, count: int, cursor: str | None):
         return await self._get_community_users(
             Endpoint.MEMBERS_SLICE_TIMELINE_QUERY, community_id, count, cursor
         )
 
-    async def moderators_slice_timeline_query(self, community_id, count, cursor):
+    async def moderators_slice_timeline_query(
+        self, community_id: str, count: int, cursor: str | None
+    ):
         return await self._get_community_users(
             Endpoint.MODERATORS_SLICE_TIMELINE_QUERY, community_id, count, cursor
         )
 
-    async def community_tweet_search_module_query(self, community_id, query, count, cursor):
-        variables = {
+    async def community_tweet_search_module_query(
+        self, community_id: str, query: str, count: int, cursor: str | None
+    ):
+        variables: dict[str, Any] = {
             'count': count,
             'query': query,
             'communityId': community_id,
@@ -619,8 +657,8 @@ class GQLClient:
             Endpoint.COMMUNITY_TWEET_SEARCH_MODULE_QUERY, variables, COMMUNITY_TWEETS_FEATURES
         )
 
-    async def tweet_results_by_rest_ids(self, tweet_ids):
-        variables = {
+    async def tweet_results_by_rest_ids(self, tweet_ids: list[str]):
+        variables: dict[str, Any] = {
             'tweetIds': tweet_ids,
             'includePromotedContent': True,
             'withBirdwatchNotes': True,
@@ -635,8 +673,8 @@ class GQLClient:
     # For guest client
     ####################
 
-    async def tweet_result_by_rest_id(self, tweet_id):
-        variables = {
+    async def tweet_result_by_rest_id(self, tweet_id: str):
+        variables: dict[str, Any] = {
             'tweetId': tweet_id,
             'withCommunity': False,
             'includePromotedContent': False,

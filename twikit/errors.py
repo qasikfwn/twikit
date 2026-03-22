@@ -1,4 +1,9 @@
 from __future__ import annotations
+from typing import TYPE_CHECKING
+
+
+if TYPE_CHECKING:
+    from httpx import Headers
 
 
 class TwitterException(Exception):
@@ -6,7 +11,7 @@ class TwitterException(Exception):
     Base class for Twitter API related exceptions.
     """
 
-    def __init__(self, *args: object, headers: dict | None = None) -> None:
+    def __init__(self, *args: object, headers: Headers | None = None) -> None:
         super().__init__(*args)
         if headers is None:
             self.headers = None
@@ -49,7 +54,7 @@ class TooManyRequests(TwitterException):
     Exception raised for 429 Too Many Requests errors.
     """
 
-    def __init__(self, *args, headers: dict | None = None) -> None:
+    def __init__(self, *args, headers: Headers | None = None) -> None:
         super().__init__(*args, headers=headers)
         if headers is not None and 'x-rate-limit-reset' in headers:
             self.rate_limit_reset = int(headers.get('x-rate-limit-reset'))

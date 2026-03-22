@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import json
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
     from ..guest.client import GuestClient
@@ -66,7 +66,14 @@ class V11Client:
     async def account_logout(self):
         return await self.base.post(Endpoint.ACCOUNT_LOGOUT, headers=self.base._base_headers)
 
-    async def onboarding_task(self, guest_token, token, subtask_inputs, data=None, **kwargs):
+    async def onboarding_task(
+        self,
+        guest_token: str,
+        token: str | None,
+        subtask_inputs: list[Any] | None,
+        data: Any = None,
+        **kwargs: Any,
+    ):
         if data is None:
             data = {}
         if token is not None:
@@ -85,7 +92,7 @@ class V11Client:
 
         return await self.base.post(Endpoint.ONBOARDING_TASK, json=data, headers=headers, **kwargs)
 
-    async def sso_init(self, provider, guest_token):
+    async def sso_init(self, provider: str, guest_token: str):
         headers = self.base._base_headers | {'x-guest-token': guest_token}
         headers.pop('X-Twitter-Active-User')
         headers.pop('X-Twitter-Auth-Type')
@@ -96,7 +103,7 @@ class V11Client:
     async def settings(self):
         return await self.base.get(Endpoint.SETTINGS, headers=self.base._base_headers)
 
-    async def upload_media(self, method, is_long_video: bool, *args, **kwargs):
+    async def upload_media(self, method: str, is_long_video: bool, *args, **kwargs):
         if is_long_video:
             endpoint = Endpoint.UPLOAD_MEDIA_2
         else:
@@ -267,25 +274,25 @@ class V11Client:
         headers = self.base._base_headers | {'content-type': 'application/x-www-form-urlencoded'}
         return await self.base.post(Endpoint.DESTROY_FRIENDSHIPS, data=data, headers=headers)
 
-    async def create_blocks(self, user_id):
+    async def create_blocks(self, user_id: str):
         data = {'user_id': user_id}
         headers = self.base._base_headers
         headers['content-type'] = 'application/x-www-form-urlencoded'
         return await self.base.post(Endpoint.CREATE_BLOCKS, data=data, headers=headers)
 
-    async def destroy_blocks(self, user_id):
+    async def destroy_blocks(self, user_id: str):
         data = {'user_id': user_id}
         headers = self.base._base_headers
         headers['content-type'] = 'application/x-www-form-urlencoded'
         return await self.base.post(Endpoint.DESTROY_BLOCKS, data=data, headers=headers)
 
-    async def create_mutes(self, user_id):
+    async def create_mutes(self, user_id: str):
         data = {'user_id': user_id}
         headers = self.base._base_headers
         headers['content-type'] = 'application/x-www-form-urlencoded'
         return await self.base.post(Endpoint.CREATE_MUTES, data=data, headers=headers)
 
-    async def destroy_mutes(self, user_id):
+    async def destroy_mutes(self, user_id: str):
         data = {'user_id': user_id}
         headers = self.base._base_headers
         headers['content-type'] = 'application/x-www-form-urlencoded'
