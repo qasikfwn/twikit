@@ -7,10 +7,10 @@ import conftest
 
 
 async def dump_reponse(response: httpx.Response) -> None:
-    if response.url.path == "/":
-        file = conftest.TEST_DATA / response.url.host / "_home"
+    if response.url.path == '/':
+        file = conftest.TEST_DATA / response.url.host / '_home'
     else:
-        file = conftest.TEST_DATA / response.url.host / response.url.path.removeprefix("/")
+        file = conftest.TEST_DATA / response.url.host / response.url.path.removeprefix('/')
     file.parent.mkdir(parents=True, exist_ok=True)
     file.write_bytes(await response.aread())
 
@@ -24,7 +24,7 @@ async def main() -> None:
 
     client = twikit.Client(
         user_agent=conftest.USER_AGENT,
-        event_hooks={"request": [log_url], "response": [dump_reponse]},
+        event_hooks={'request': [log_url], 'response': [dump_reponse]},
     )
 
     client.http.cookies.clear()

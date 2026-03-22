@@ -23,13 +23,8 @@ class Message:
     attachment : :class:`dict`
         Attachment Information.
     """
-    def __init__(
-        self,
-        client: Client,
-        data: dict,
-        sender_id: str,
-        recipient_id: str
-    ) -> None:
+
+    def __init__(self, client: Client, data: dict, sender_id: str, recipient_id: str) -> None:
         self._client = client
         self.sender_id = sender_id
         self.recipient_id = recipient_id
@@ -61,11 +56,7 @@ class Message:
         Client.send_dm
         """
         user_id = await self._client.user_id()
-        send_to = (
-            self.recipient_id
-            if user_id == self.sender_id else
-            self.sender_id
-        )
+        send_to = self.recipient_id if user_id == self.sender_id else self.sender_id
         return await self._client.send_dm(send_to, text, media_id, self.id)
 
     async def add_reaction(self, emoji: str) -> Response:
@@ -83,15 +74,9 @@ class Message:
             Response returned from twitter api.
         """
         user_id = await self._client.user_id()
-        partner_id = (
-            self.recipient_id
-            if user_id == self.sender_id else
-            self.sender_id
-        )
+        partner_id = self.recipient_id if user_id == self.sender_id else self.sender_id
         conversation_id = f'{partner_id}-{user_id}'
-        return await self._client.add_reaction_to_message(
-            self.id, conversation_id, emoji
-        )
+        return await self._client.add_reaction_to_message(self.id, conversation_id, emoji)
 
     async def remove_reaction(self, emoji: str) -> Response:
         """
@@ -108,15 +93,9 @@ class Message:
             Response returned from twitter api.
         """
         user_id = await self._client.user_id()
-        partner_id = (
-            self.recipient_id
-            if user_id == self.sender_id else
-            self.sender_id
-        )
+        partner_id = self.recipient_id if user_id == self.sender_id else self.sender_id
         conversation_id = f'{partner_id}-{user_id}'
-        return await self._client.remove_reaction_from_message(
-            self.id, conversation_id, emoji
-        )
+        return await self._client.remove_reaction_from_message(self.id, conversation_id, emoji)
 
     async def delete(self) -> Response:
         """

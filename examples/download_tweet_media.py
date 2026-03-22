@@ -19,4 +19,5 @@ async def main():
         if media.type == 'video':
             await media.streams[-1].download(f'media_{i}.mp4')
 
+
 asyncio.run(main())

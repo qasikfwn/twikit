@@ -118,7 +118,7 @@ class Community:
                 self.creator = CommunityCreator(
                     b64_to_str(creator['id']).removeprefix('User:'),
                     creator['legacy']['screen_name'],
-                    creator['legacy']['verified']
+                    creator['legacy']['verified'],
                 )
         else:
             self.creator = None
@@ -135,9 +135,7 @@ class Community:
         self.is_pinned: bool = data.get('is_pinned')
 
         if 'rules' in data:
-            self.rules: list = [
-                CommunityRule(i['rest_id'], i['name']) for i in data['rules']
-            ]
+            self.rules: list = [CommunityRule(i['rest_id'], i['name']) for i in data['rules']]
         else:
             self.rules = None
 
@@ -145,7 +143,7 @@ class Community:
         self,
         tweet_type: Literal['Top', 'Latest', 'Media'],
         count: int = 40,
-        cursor: str | None = None
+        cursor: str | None = None,
     ) -> Result[Tweet]:
         """
         Retrieves tweets from the community.
@@ -172,12 +170,7 @@ class Community:
         ...
         >>> more_tweets = await tweets.next()  # Retrieve more tweets
         """
-        return await self._client.get_community_tweets(
-            self.id,
-            tweet_type,
-            count,
-            cursor
-        )
+        return await self._client.get_community_tweets(self.id, tweet_type, count, cursor)
 
     async def join(self) -> Community:
         """
@@ -213,11 +206,7 @@ class Community:
         Result[:class:`CommunityMember`]
             List of retrieved members.
         """
-        return await self._client.get_community_members(
-            self.id,
-            count,
-            cursor
-        )
+        return await self._client.get_community_members(self.id, count, cursor)
 
     async def get_moderators(
         self, count: int = 20, cursor: str | None = None
@@ -235,18 +224,11 @@ class Community:
         Result[:class:`CommunityMember`]
             List of retrieved moderators.
         """
-        return await self._client.get_community_moderators(
-            self.id,
-            count,
-            cursor
-        )
+        return await self._client.get_community_moderators(self.id, count, cursor)
 
     async def search_tweet(
-        self,
-        query: str,
-        count: int = 20,
-        cursor: str | None = None
-    )-> Result[Tweet]:
+        self, query: str, count: int = 20, cursor: str | None = None
+    ) -> Result[Tweet]:
         """Searchs tweets in the community.
 
         Parameters
@@ -261,12 +243,7 @@ class Community:
         Result[:class:`Tweet`]
             List of retrieved tweets.
         """
-        return await self._client.search_community_tweet(
-            self.id,
-            query,
-            count,
-            cursor
-        )
+        return await self._client.search_community_tweet(self.id, query, count, cursor)
 
     async def update(self) -> None:
         new = await self._client.get_community(self.id)

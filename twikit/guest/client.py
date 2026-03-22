@@ -20,7 +20,7 @@ from ..errors import (
     ServerError,
     TooManyRequests,
     TwitterException,
-    Unauthorized
+    Unauthorized,
 )
 from ..utils import Result, find_dict, find_entry_by_type, httpx_transport_to_url
 from ..client_transaction import IClientTransaction
@@ -29,7 +29,7 @@ from .user import User
 
 
 def tweet_from_data(client: GuestClient, data: dict) -> Tweet:
-    ':meta private:'
+    ":meta private:"
     tweet_data_ = find_dict(data, 'result', True)
     if not tweet_data_:
         return None
@@ -70,16 +70,11 @@ class GuestClient:
     >>> await client.activate()  # Activate the client by generating a guest token.
     """
 
-    def __init__(
-        self,
-        language: str = 'en-US',
-        proxy: str | None = None,
-        **kwargs
-    ) -> None:
+    def __init__(self, language: str = 'en-US', proxy: str | None = None, **kwargs) -> None:
         if 'proxies' in kwargs:
             message = (
                 "The 'proxies' argument is now deprecated. Use 'proxy' "
-                "instead. https://github.com/encode/httpx/pull/2879"
+                'instead. https://github.com/encode/httpx/pull/2879'
             )
             warnings.warn(message)
 
@@ -88,22 +83,20 @@ class GuestClient:
         self.proxy = proxy
 
         self._token = TOKEN
-        self._user_agent = ('Mozilla/5.0 (Windows NT 10.0; Win64; x64) '
-                            'AppleWebKit/537.36 (KHTML, like Gecko) '
-                            'Chrome/122.0.0.0 Safari/537.36')
+        self._user_agent = (
+            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) '
+            'AppleWebKit/537.36 (KHTML, like Gecko) '
+            'Chrome/122.0.0.0 Safari/537.36'
+        )
         self._guest_token: str | None = None  # set when activate method is called
         self.gql = GQLClient(self)
         self.v11 = V11Client(self)
         self.client_transaction = IClientTransaction()
 
     async def request(
-        self,
-        method: str,
-        url: str,
-        raise_exception: bool = True,
-        **kwargs
+        self, method: str, url: str, raise_exception: bool = True, **kwargs
     ) -> tuple[dict | Any, Response]:
-        ':meta private:'
+        ":meta private:"
         headers = kwargs.pop('headers', {})
 
         if not self.client_transaction.home_page_response:
@@ -112,12 +105,14 @@ class GuestClient:
                 'Accept-Language': f'{self.language},{self.language.split("-")[0]};q=0.9',
                 'Cache-Control': 'no-cache',
                 'Referer': f'https://{DOMAIN}',
-                'User-Agent': self._user_agent
+                'User-Agent': self._user_agent,
             }
             await self.client_transaction.init(self.http, ct_headers)
             self.http.cookies = cookies_backup
 
-        tid = self.client_transaction.generate_transaction_id(method=method, path=urlparse(url).path)
+        tid = self.client_transaction.generate_transaction_id(
+            method=method, path=urlparse(url).path
+        )
         headers['X-Client-Transaction-Id'] = tid
 
         response = await self.http.request(method, url, headers=headers, **kwargs)
@@ -151,19 +146,17 @@ class GuestClient:
         return response_data, response
 
     async def get(self, url, **kwargs) -> tuple[dict | Any, Response]:
-        ':meta private:'
+        ":meta private:"
         return await self.request('GET', url, **kwargs)
 
     async def post(self, url, **kwargs) -> tuple[dict | Any, Response]:
-        ':meta private:'
+        ":meta private:"
         return await self.request('POST', url, **kwargs)
 
     @property
     def proxy(self) -> str:
-        ':meta private:'
-        transport: AsyncHTTPTransport = self.http._mounts.get(
-            URLPattern('all://')
-        )
+        ":meta private:"
+        transport: AsyncHTTPTransport = self.http._mounts.get(URLPattern('all://'))
         if transport is None:
             return None
         if not hasattr(transport._pool, '_proxy_url'):
@@ -172,9 +165,7 @@ class GuestClient:
 
     @proxy.setter
     def proxy(self, url: str) -> None:
-        self.http._mounts = {
-            URLPattern('all://'): AsyncHTTPTransport(proxy=url)
-        }
+        self.http._mounts = {URLPattern('all://'): AsyncHTTPTransport(proxy=url)}
 
     @property
     def _base_headers(self) -> dict[str, str]:
@@ -344,10 +335,7 @@ class GuestClient:
         return tweet_from_data(self, response)
 
     async def get_user_highlights_tweets(
-        self,
-        user_id: str,
-        count: int = 20,
-        cursor: str | None = None
+        self, user_id: str, count: int = 20, cursor: str | None = None
     ) -> Result[Tweet]:
         """
         Retrieves highlighted tweets from a user's timeline.
@@ -407,5 +395,5 @@ class GuestClient:
             partial(self.get_user_highlights_tweets, user_id, count, next_cursor),
             next_cursor,
             partial(self.get_user_highlights_tweets, user_id, count, previous_cursor),
-            previous_cursor
+            previous_cursor,
         )

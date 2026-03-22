@@ -252,22 +252,19 @@ class Tweet:
         if community_note_data and 'note' in community_note_data:
             return {
                 'id': community_note_data['note']['rest_id'],
-                'text': community_note_data['subtitle']['text']
+                'text': community_note_data['subtitle']['text'],
             }
 
     @property
     def _binding_values(self) -> dict | None:
         if (
-            'card' in self._data and
-            'legacy' in self._data['card'] and
-            'binding_values' in self._data['card']['legacy']
+            'card' in self._data
+            and 'legacy' in self._data['card']
+            and 'binding_values' in self._data['card']['legacy']
         ):
             card_data = self._data['card']['legacy']['binding_values']
             if isinstance(card_data, list):
-                return {
-                    i.get('key'): i.get('value')
-                    for i in card_data
-                }
+                return {i.get('key'): i.get('value') for i in card_data}
 
     @property
     def has_card(self) -> bool:
@@ -277,9 +274,9 @@ class Tweet:
     def thumbnail_title(self) -> str | None:
         binding_values = self._binding_values
         if (
-            binding_values and
-            'title' in binding_values and
-            'string_value' in binding_values['title']
+            binding_values
+            and 'title' in binding_values
+            and 'string_value' in binding_values['title']
         ):
             return binding_values['title']['string_value']
 
@@ -287,10 +284,10 @@ class Tweet:
     def thumbnail_url(self) -> str | None:
         binding_values = self._binding_values
         if (
-            binding_values and
-            'thumbnail_image_original' in binding_values and
-            'image_value' in binding_values['thumbnail_image_original'] and
-            'url' in binding_values['thumbnail_image_original']['image_value']
+            binding_values
+            and 'thumbnail_image_original' in binding_values
+            and 'image_value' in binding_values['thumbnail_image_original']
+            and 'url' in binding_values['thumbnail_image_original']['image_value']
         ):
             return binding_values['thumbnail_image_original']['image_value']['url']
 
@@ -301,10 +298,10 @@ class Tweet:
     @property
     def poll(self) -> Poll:
         if (
-            'card' in self._data and
-            'legacy' in self._data['card'] and
-            'name' in self._data['card']['legacy'] and
-            self._data['card']['legacy']['name'].startswith('poll')
+            'card' in self._data
+            and 'legacy' in self._data['card']
+            and 'name' in self._data['card']['legacy']
+            and self._data['card']['legacy']['name'].startswith('poll')
         ):
             return Poll(self._client, self._data['card'], self)
 
@@ -428,12 +425,7 @@ class Tweet:
         """
         return await self._client.delete_bookmark(self.id)
 
-    async def reply(
-        self,
-        text: str = '',
-        media_ids: list[str] | None = None,
-        **kwargs
-    ) -> Tweet:
+    async def reply(self, text: str = '', media_ids: list[str] | None = None, **kwargs) -> Tweet:
         """
         Replies to the tweet.
 
@@ -466,13 +458,9 @@ class Tweet:
         --------
         `Client.upload_media`
         """
-        return await self._client.create_tweet(
-            text, media_ids, reply_to=self.id, **kwargs
-        )
+        return await self._client.create_tweet(text, media_ids, reply_to=self.id, **kwargs)
 
-    async def get_retweeters(
-        self, count: str = 40, cursor: str | None = None
-    ) -> Result[User]:
+    async def get_retweeters(self, count: str = 40, cursor: str | None = None) -> Result[User]:
         """
         Retrieve users who retweeted the tweet.
 
@@ -501,9 +489,7 @@ class Tweet:
         """
         return await self._client.get_retweeters(self.id, count, cursor)
 
-    async def get_favoriters(
-        self, count: str = 40, cursor: str | None = None
-    ) -> Result[User]:
+    async def get_favoriters(self, count: str = 40, cursor: str | None = None) -> Result[User]:
         """
         Retrieve users who favorited a specific tweet.
 
@@ -561,7 +547,7 @@ class Tweet:
 
 
 def tweet_from_data(client: Client, data: dict) -> Tweet:
-    ':meta private:'
+    ":meta private:"
     tweet_data_ = find_dict(data, 'result', True)
     if not tweet_data_:
         return None
@@ -648,9 +634,7 @@ class Poll:
         Number of the selected choice.
     """
 
-    def __init__(
-        self, client: Client, data: dict, tweet: Tweet | None = None
-    ) -> None:
+    def __init__(self, client: Client, data: dict, tweet: Tweet | None = None) -> None:
         self._client = client
         self.tweet = tweet
 
@@ -658,27 +642,24 @@ class Poll:
         binding_values = legacy['binding_values']
 
         if isinstance(legacy['binding_values'], list):
-            binding_values = {
-                i.get('key'): i.get('value')
-                for i in legacy['binding_values']
-            }
+            binding_values = {i.get('key'): i.get('value') for i in legacy['binding_values']}
 
         self.id: str = data['rest_id']
         self.name: str = legacy['name']
 
-        choices_number = int(re.findall(
-            r'poll(\d)choice_text_only', self.name
-        )[0])
+        choices_number = int(re.findall(r'poll(\d)choice_text_only', self.name)[0])
         choices = []
 
         for i in range(1, choices_number + 1):
             choice_label = binding_values[f'choice{i}_label']
             choice_count = binding_values.get(f'choice{i}_count', {})
-            choices.append({
-                'number': str(i),
-                'label': choice_label['string_value'],
-                'count': choice_count.get('string_value', '0')
-            })
+            choices.append(
+                {
+                    'number': str(i),
+                    'label': choice_label['string_value'],
+                    'count': choice_count.get('string_value', '0'),
+                }
+            )
 
         self.choices = choices
 
@@ -706,12 +687,7 @@ class Poll:
         :class:`Poll`
             The Poll object representing the updated poll after voting.
         """
-        return await self._client.vote(
-            selected_choice,
-            self.id,
-            self.tweet.id,
-            self.name
-        )
+        return await self._client.vote(selected_choice, self.id, self.tweet.id, self.name)
 
     def __repr__(self) -> str:
         return f'<Poll id="{self.id}">'
@@ -753,6 +729,7 @@ class CommunityNote:
     tweet_id : :class:`str`
         The ID of the tweet associated with the note.
     """
+
     def __init__(self, client: Client, data: dict) -> None:
         self._client = client
         self.id: str = data['rest_id']

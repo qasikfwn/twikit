@@ -41,6 +41,7 @@ class Media:
         The height of the media.
     focus_rects : :class:`list`
     """
+
     def __init__(self, client: Client, data: dict) -> None:
         self._client = client
         self._data = data
@@ -119,6 +120,7 @@ class Photo(Media):
     features : :class:`dict`
         The features of the photo.
     """
+
     @property
     def features(self) -> dict:
         return self._data.get('features')
@@ -137,6 +139,7 @@ class Stream:
     content_type : :class:`str`
         The mimetype of the stream content.
     """
+
     def __init__(self, client: Client, data: dict) -> None:
         self._client = client
         self._data = data
@@ -194,6 +197,7 @@ class AnimatedGif(Media):
     streams : list[:class:`Stream`]
         The list of video streams for the GIF.
     """
+
     @property
     def video_info(self) -> dict:
         return self._data.get('video_info')
@@ -204,7 +208,9 @@ class AnimatedGif(Media):
 
     @property
     def streams(self) -> list:
-        return [Stream(self._client, stream_data) for stream_data in self.video_info.get('variants')]
+        return [
+            Stream(self._client, stream_data) for stream_data in self.video_info.get('variants')
+        ]
 
 
 class Video(Media):
@@ -231,6 +237,7 @@ class Video(Media):
     streams : list[:class:`Stream`]
         The list of video streams for the video.
     """
+
     def __init__(self, client: Client, data: dict) -> None:
         super().__init__(client, data)
         self._playlist: M3U8 | None = None
@@ -255,10 +262,7 @@ class Video(Media):
 
     @property
     def streams(self) -> list[Stream]:
-        video_streams = filter(
-            lambda x: x['content_type'].startswith('video'),
-            self._streams
-        )
+        video_streams = filter(lambda x: x['content_type'].startswith('video'), self._streams)
         return [Stream(self._client, stream_data) for stream_data in video_streams]
 
     async def _get_playlist(self) -> M3U8 | None:
@@ -266,11 +270,7 @@ class Video(Media):
         if self._playlist:
             return self._playlist
         m3u8_stream = next(
-            filter(
-                lambda x: x['content_type'] == 'application/x-mpegURL',
-                self._streams
-            ),
-            None
+            filter(lambda x: x['content_type'] == 'application/x-mpegURL', self._streams), None
         )
         if not m3u8_stream:
             raise None
@@ -286,13 +286,7 @@ class Video(Media):
         playlist = await self._get_playlist()
         if not playlist:
             return None
-        subtitles_media = next(
-            filter(
-                lambda x: x.type == 'SUBTITLES',
-                playlist.media
-            ),
-            None
-        )
+        subtitles_media = next(filter(lambda x: x.type == 'SUBTITLES', playlist.media), None)
         if not subtitles_media:
             return None
         response, _ = await self._client.get(self._base_url + subtitles_media.uri)
@@ -330,11 +324,7 @@ class Video(Media):
 
 
 MEDIA_TYPE = Video | Photo | AnimatedGif
-MEDIA_TYPE_MAPPING = {
-    'video': Video,
-    'photo': Photo,
-    'animated_gif': AnimatedGif
-}
+MEDIA_TYPE_MAPPING = {'video': Video, 'photo': Photo, 'animated_gif': AnimatedGif}
 
 
 def _media_from_data(client, data) -> Media:

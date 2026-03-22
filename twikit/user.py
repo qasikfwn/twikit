@@ -387,9 +387,7 @@ class User:
         Retrieves the latest followers.
         Max count : 200
         """
-        return await self._client.get_latest_followers(
-            self.id, count=count, cursor=cursor
-        )
+        return await self._client.get_latest_followers(self.id, count=count, cursor=cursor)
 
     async def get_latest_friends(
         self, count: int | None = None, cursor: str | None = None
@@ -398,13 +396,9 @@ class User:
         Retrieves the latest friends (following users).
         Max count : 200
         """
-        return await self._client.get_latest_friends(
-            self.id, count=count, cursor=cursor
-        )
+        return await self._client.get_latest_friends(self.id, count=count, cursor=cursor)
 
-    async def send_dm(
-        self, text: str, media_id: str = None, reply_to = None
-    ) -> Message:
+    async def send_dm(self, text: str, media_id: str = None, reply_to=None) -> Message:
         """
         Send a direct message to the user.
 
@@ -474,7 +468,9 @@ class User:
         """
         return await self._client.get_dm_history(self.id, max_id)
 
-    async def get_highlights_tweets(self, count: int = 20, cursor: str | None = None) -> Result[Tweet]:
+    async def get_highlights_tweets(
+        self, count: int = 20, cursor: str | None = None
+    ) -> Result[Tweet]:
         """
         Retrieves highlighted tweets from the user's timeline.
 

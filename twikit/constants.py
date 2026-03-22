@@ -24,7 +24,7 @@ FEATURES = {
     'responsive_web_media_download_video_enabled': False,
     'responsive_web_graphql_skip_user_profile_image_extensions_enabled': False,
     'responsive_web_graphql_timeline_navigation_enabled': True,
-    'responsive_web_enhance_cards_enabled': False
+    'responsive_web_enhance_cards_enabled': False,
 }
 
 USER_FEATURES = {
@@ -38,14 +38,14 @@ USER_FEATURES = {
     'responsive_web_twitter_article_notes_tab_enabled': False,
     'creator_subscriptions_tweet_preview_api_enabled': True,
     'responsive_web_graphql_skip_user_profile_image_extensions_enabled': False,
-    'responsive_web_graphql_timeline_navigation_enabled': True
+    'responsive_web_graphql_timeline_navigation_enabled': True,
 }
 
 LIST_FEATURES = {
     'responsive_web_graphql_exclude_directive_enabled': True,
     'verified_phone_label_enabled': False,
     'responsive_web_graphql_skip_user_profile_image_extensions_enabled': False,
-    'responsive_web_graphql_timeline_navigation_enabled': True
+    'responsive_web_graphql_timeline_navigation_enabled': True,
 }
 
 COMMUNITY_NOTE_FEATURES = {
@@ -54,7 +54,7 @@ COMMUNITY_NOTE_FEATURES = {
     'rweb_tipjar_consumption_enabled': False,
     'responsive_web_graphql_exclude_directive_enabled': True,
     'verified_phone_label_enabled': False,
-    'responsive_web_graphql_skip_user_profile_image_extensions_enabled': False
+    'responsive_web_graphql_skip_user_profile_image_extensions_enabled': False,
 }
 
 COMMUNITY_TWEETS_FEATURES = {
@@ -80,7 +80,7 @@ COMMUNITY_TWEETS_FEATURES = {
     'rweb_video_timestamps_enabled': True,
     'longform_notetweets_rich_text_read_enabled': True,
     'longform_notetweets_inline_media_enabled': True,
-    'responsive_web_enhance_cards_enabled': False
+    'responsive_web_enhance_cards_enabled': False,
 }
 
 JOIN_COMMUNITY_FEATURES = {
@@ -88,7 +88,7 @@ JOIN_COMMUNITY_FEATURES = {
     'responsive_web_graphql_exclude_directive_enabled': True,
     'verified_phone_label_enabled': False,
     'responsive_web_graphql_skip_user_profile_image_extensions_enabled': False,
-    'responsive_web_graphql_timeline_navigation_enabled': True
+    'responsive_web_graphql_timeline_navigation_enabled': True,
 }
 
 NOTE_TWEET_FEATURES = {
@@ -115,7 +115,7 @@ NOTE_TWEET_FEATURES = {
     'tweet_with_visibility_results_prefer_gql_media_interstitial_enabled': True,
     'responsive_web_graphql_skip_user_profile_image_extensions_enabled': False,
     'responsive_web_graphql_timeline_navigation_enabled': True,
-    'responsive_web_enhance_cards_enabled': False
+    'responsive_web_enhance_cards_enabled': False,
 }
 
 SIMILAR_POSTS_FEATURES = {
@@ -143,7 +143,7 @@ SIMILAR_POSTS_FEATURES = {
     'rweb_video_timestamps_enabled': True,
     'longform_notetweets_rich_text_read_enabled': True,
     'longform_notetweets_inline_media_enabled': True,
-    'responsive_web_enhance_cards_enabled': False
+    'responsive_web_enhance_cards_enabled': False,
 }
 
 BOOKMARK_FOLDER_TIMELINE_FEATURES = {
@@ -171,7 +171,7 @@ BOOKMARK_FOLDER_TIMELINE_FEATURES = {
     'rweb_video_timestamps_enabled': True,
     'longform_notetweets_rich_text_read_enabled': True,
     'longform_notetweets_inline_media_enabled': True,
-    'responsive_web_enhance_cards_enabled': False
+    'responsive_web_enhance_cards_enabled': False,
 }
 
 TWEET_RESULT_BY_REST_ID_FEATURES = {
@@ -198,7 +198,7 @@ TWEET_RESULT_BY_REST_ID_FEATURES = {
     'verified_phone_label_enabled': False,
     'responsive_web_graphql_skip_user_profile_image_extensions_enabled': False,
     'responsive_web_graphql_timeline_navigation_enabled': True,
-    'responsive_web_enhance_cards_enabled': False
+    'responsive_web_enhance_cards_enabled': False,
 }
 
 USER_HIGHLIGHTS_TWEETS_FEATURES = {
@@ -225,7 +225,7 @@ USER_HIGHLIGHTS_TWEETS_FEATURES = {
     'rweb_video_timestamps_enabled': True,
     'longform_notetweets_rich_text_read_enabled': True,
     'longform_notetweets_inline_media_enabled': True,
-    'responsive_web_enhance_cards_enabled': False
+    'responsive_web_enhance_cards_enabled': False,
 }
 
 TWEET_RESULTS_BY_REST_IDS_FEATURES = {
@@ -256,5 +256,5 @@ TWEET_RESULTS_BY_REST_IDS_FEATURES = {
     'verified_phone_label_enabled': False,
     'responsive_web_graphql_skip_user_profile_image_extensions_enabled': False,
     'responsive_web_graphql_timeline_navigation_enabled': True,
-    'responsive_web_enhance_cards_enabled': False
+    'responsive_web_enhance_cards_enabled': False,
 }

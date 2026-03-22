@@ -119,7 +119,9 @@ class User:
     def created_at_datetime(self) -> datetime:
         return timestamp_to_datetime(self.created_at)
 
-    async def get_tweets(self, tweet_type: Literal['Tweets'] = 'Tweets', count: int = 40) -> list[Tweet]:
+    async def get_tweets(
+        self, tweet_type: Literal['Tweets'] = 'Tweets', count: int = 40
+    ) -> list[Tweet]:
         """
         Retrieves the user's tweets.
 
@@ -148,7 +150,9 @@ class User:
         """
         return await self._client.get_user_tweets(self.id, tweet_type, count)
 
-    async def get_highlights_tweets(self, count: int = 20, cursor: str | None = None) -> Result[Tweet]:
+    async def get_highlights_tweets(
+        self, count: int = 20, cursor: str | None = None
+    ) -> Result[Tweet]:
         """
         Retrieves highlighted tweets from the user's timeline.
 

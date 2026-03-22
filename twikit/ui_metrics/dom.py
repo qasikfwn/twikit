@@ -40,13 +40,10 @@ class MockDocument:
         self.element_seq.append(element)
         return element
 
-    def _filter_elements(self, function: Callable[[MockElement], list[MockElement]]) -> list[MockElement]:
-        return list(
-            filter(
-                function,
-                self.element_seq
-            )
-        )
+    def _filter_elements(
+        self, function: Callable[[MockElement], list[MockElement]]
+    ) -> list[MockElement]:
+        return list(filter(function, self.element_seq))
 
     def getElementsByTagName(self, tag_name):
         return self._filter_elements(lambda x: x.tagName == tag_name)

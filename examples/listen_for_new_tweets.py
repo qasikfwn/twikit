@@ -28,10 +28,11 @@ async def main() -> NoReturn:
         await asyncio.sleep(CHECK_INTERVAL)
         latest_tweet = await get_latest_tweet()
         if (
-            before_tweet != latest_tweet and
-            before_tweet.created_at_datetime < latest_tweet.created_at_datetime
+            before_tweet != latest_tweet
+            and before_tweet.created_at_datetime < latest_tweet.created_at_datetime
         ):
             callable(latest_tweet)
         before_tweet = latest_tweet
+
 
 asyncio.run(main())

@@ -48,6 +48,7 @@ class List:
     subscriber_count : :class:`int`
         The number of subscribers to the List.
     """
+
     def __init__(self, client: Client, data: dict) -> None:
         self._client = client
 
@@ -56,7 +57,7 @@ class List:
         self.default_banner: dict = data['default_banner_media']['media_info']
 
         if 'custom_banner_media' in data:
-            self.banner: dict = data["custom_banner_media"]["media_info"]
+            self.banner: dict = data['custom_banner_media']['media_info']
         else:
             self.banner: dict = self.default_banner
 
@@ -105,7 +106,7 @@ class List:
         self,
         name: str | None = None,
         description: str | None = None,
-        is_private: bool | None = None
+        is_private: bool | None = None,
     ) -> List:
         """
         Edits list information.
@@ -131,9 +132,7 @@ class List:
         ...     'new name', 'new description', True
         ... )
         """
-        return await self._client.edit_list(
-            self.id, name, description, is_private
-        )
+        return await self._client.edit_list(self.id, name, description, is_private)
 
     async def add_member(self, user_id: str) -> Response:
         """
@@ -147,9 +146,7 @@ class List:
         """
         return await self._client.remove_list_member(self.id, user_id)
 
-    async def get_tweets(
-        self, count: int = 20, cursor: str | None = None
-    ) -> Result[Tweet]:
+    async def get_tweets(self, count: int = 20, cursor: str | None = None) -> Result[Tweet]:
         """
         Retrieves tweets from the list.
 
@@ -185,9 +182,7 @@ class List:
         """
         return await self._client.get_list_tweets(self.id, count, cursor)
 
-    async def get_members(
-        self, count: int = 20, cursor: str | None = None
-    ) -> Result[User]:
+    async def get_members(self, count: int = 20, cursor: str | None = None) -> Result[User]:
         """Retrieves members of the list.
 
         Parameters
@@ -213,9 +208,7 @@ class List:
         """
         return await self._client.get_list_members(self.id, count, cursor)
 
-    async def get_subscribers(
-        self, count: int = 20, cursor: str | None = None
-    ) -> Result[User]:
+    async def get_subscribers(self, count: int = 20, cursor: str | None = None) -> Result[User]:
         """Retrieves subscribers of the list.
 
         Parameters

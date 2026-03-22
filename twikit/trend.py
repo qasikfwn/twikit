@@ -27,9 +27,7 @@ class Trend:
         self.name: str = data['name']
         self.tweets_count: int | None = metadata.get('metaDescription')
         self.domain_context: str = metadata.get('domainContext')
-        self.grouped_trends: list[str] = [
-            trend['name'] for trend in data.get('groupedTrends', [])
-        ]
+        self.grouped_trends: list[str] = [trend['name'] for trend in data.get('groupedTrends', [])]
 
     def __repr__(self) -> str:
         return f'<Trend name="{self.name}">'
@@ -55,6 +53,7 @@ class PlaceTrend:
     tweet_volume : :class:`int`
         The volume of tweets associated with the trend.
     """
+
     def __init__(self, client: Client, data: dict) -> None:
         self._client = client
 

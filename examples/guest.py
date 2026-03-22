@@ -16,11 +16,11 @@ async def main():
     user = await client.get_user_by_id('44196397')
     print(user)
 
-
     user_tweets = await client.get_user_tweets('44196397')
     print(user_tweets)
 
     tweet = await client.get_tweet_by_id('1519480761749016577')
     print(tweet)
+
 
 asyncio.run(main())

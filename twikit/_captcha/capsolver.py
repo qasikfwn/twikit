@@ -40,7 +40,7 @@ class Capsolver(CaptchaSolver):
         api_key: str,
         max_attempts: int = 3,
         get_result_interval: float = 1.0,
-        use_blob_data: bool = False
+        use_blob_data: bool = False,
     ) -> None:
         self.api_key = api_key
         self.get_result_interval = get_result_interval
@@ -48,26 +48,20 @@ class Capsolver(CaptchaSolver):
         self.use_blob_data = use_blob_data
 
     def create_task(self, task_data: dict) -> dict:
-        data = {
-            'clientKey': self.api_key,
-            'task': task_data
-        }
+        data = {'clientKey': self.api_key, 'task': task_data}
         response = httpx.post(
             'https://api.capsolver.com/createTask',
             json=data,
-            headers={'content-type': 'application/json'}
+            headers={'content-type': 'application/json'},
         ).json()
         return response
 
     def get_task_result(self, task_id: str) -> dict:
-        data = {
-            'clientKey': self.api_key,
-            'taskId': task_id
-        }
+        data = {'clientKey': self.api_key, 'taskId': task_id}
         response = httpx.post(
             'https://api.capsolver.com/getTaskResult',
             json=data,
-            headers={'content-type': 'application/json'}
+            headers={'content-type': 'application/json'},
         ).json()
         return response
 
@@ -82,7 +76,7 @@ class Capsolver(CaptchaSolver):
             'websiteURL': 'https://iframe.arkoselabs.com',
             'websitePublicKey': self.CAPTCHA_SITE_KEY,
             'funcaptchaApiJSSubdomain': 'https://client-api.arkoselabs.com',
-            'proxy': self.client.proxy
+            'proxy': self.client.proxy,
         }
         if self.use_blob_data:
             task_data['data'] = '{"blob":"%s"}' % blob

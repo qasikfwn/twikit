@@ -32,17 +32,13 @@ class CaptchaSolver:
         headers = {
             'X-Twitter-Client-Language': 'en-US',
             'User-Agent': self.client._user_agent,
-            'Upgrade-Insecure-Requests': '1'
+            'Upgrade-Insecure-Requests': '1',
         }
-        _, response = await self.client.get(
-            self.CAPTCHA_URL, headers=headers
-        )
+        _, response = await self.client.get(self.CAPTCHA_URL, headers=headers)
         return response, parse_unlock_html(response.text)
 
     async def ui_metrix(self) -> str:
-        js, _ = await self.client.get(
-            f'https://{DOMAIN}/i/js_inst?c_name=ui_metrics'
-        )
+        js, _ = await self.client.get(f'https://{DOMAIN}/i/js_inst?c_name=ui_metrics')
         return re.findall(r'return ({.*?});', js, re.DOTALL)[0]
 
     async def confirm_unlock(
@@ -50,7 +46,7 @@ class CaptchaSolver:
         authenticity_token: str,
         assignment_token: str,
         verification_string: str = None,
-        ui_metrics: bool = False
+        ui_metrics: bool = False,
     ) -> tuple[Response, UnlockHTML]:
         data = {
             'authenticity_token': authenticity_token,
@@ -68,7 +64,7 @@ class CaptchaSolver:
         headers = {
             'Content-Type': 'application/x-www-form-urlencoded',
             'Upgrade-Insecure-Requests': '1',
-            'Referer': self.CAPTCHA_URL
+            'Referer': self.CAPTCHA_URL,
         }
         _, response = await self.client.post(
             self.CAPTCHA_URL, params=params, data=data, headers=headers
@@ -80,9 +76,7 @@ def parse_unlock_html(html: str) -> UnlockHTML:
     soup = BeautifulSoup(html, 'lxml')
 
     authenticity_token = None
-    authenticity_token_element = soup.find(
-        'input', {'name': 'authenticity_token'}
-    )
+    authenticity_token_element = soup.find('input', {'name': 'authenticity_token'})
     if authenticity_token_element is not None:
         authenticity_token: str = authenticity_token_element.get('value')
 
@@ -107,5 +101,5 @@ def parse_unlock_html(html: str) -> UnlockHTML:
         start_button,
         finish_button,
         delete_button,
-        blob
+        blob,
     )

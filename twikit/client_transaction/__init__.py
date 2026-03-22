@@ -4,8 +4,8 @@ from httpx import AsyncClient
 from x_client_transaction import ClientTransaction
 from x_client_transaction import utils
 
-class IClientTransaction:
 
+class IClientTransaction:
     home_page_response: bs4.BeautifulSoup | None = None
     client_transaction: ClientTransaction | None = None
 
@@ -23,7 +23,9 @@ class IClientTransaction:
 
         self.client_transaction = ClientTransaction(self.home_page_response, ondemand_file_response)
 
-    def generate_transaction_id(self, method: str, path: str, ) -> str:
+    def generate_transaction_id(
+        self,
+        method: str,
+        path: str,
+    ) -> str:
         return self.client_transaction.generate_transaction_id(method, path)
-
-

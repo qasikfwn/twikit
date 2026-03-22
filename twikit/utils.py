@@ -37,7 +37,7 @@ class Result(Generic[T]):
         fetch_next_result: Awaitable | None = None,
         next_cursor: str | None = None,
         fetch_previous_result: Awaitable | None = None,
-        previous_cursor: str | None = None
+        previous_cursor: str | None = None,
     ) -> None:
         self.__results = results
         self.next_cursor = next_cursor
@@ -119,7 +119,7 @@ def find_dict(obj: list | dict, key: str | int, find_one: bool = False) -> list[
             if find_one:
                 return results
     if isinstance(obj, (list, dict)):
-        for elem in (obj if isinstance(obj, list) else obj.values()):
+        for elem in obj if isinstance(obj, list) else obj.values():
             r = find_dict(elem, key, find_one)
             results += r
             if r and find_one:
@@ -183,8 +183,8 @@ def build_tweet_data(raw_data: dict) -> dict:
             'reply_count': raw_data.get('reply_count'),
             'favorite_count': raw_data.get('favorite_count'),
             'favorited': raw_data.get('favorited'),
-            'retweet_count': raw_data.get('retweet_count')
-        }
+            'retweet_count': raw_data.get('retweet_count'),
+        },
     }
 
 
@@ -222,8 +222,8 @@ def build_user_data(raw_data: dict) -> dict:
             'translator_type': raw_data.get('translator_type'),
             'withheld_in_countries': raw_data.get('withheld_in_countries'),
             'url': raw_data.get('url'),
-            'profile_banner_url': raw_data.get('profile_banner_url')
-        }
+            'profile_banner_url': raw_data.get('profile_banner_url'),
+        },
     }
 
 
@@ -248,14 +248,7 @@ def find_entry_by_type(entries, type_filter):
 
 
 FILTERS = Literal[
-    'media',
-    'retweets',
-    'native_video',
-    'periscope',
-    'vine',
-    'images',
-    'twimg',
-    'links'
+    'media', 'retweets', 'native_video', 'periscope', 'vine', 'images', 'twimg', 'links'
 ]
 
 
@@ -333,48 +326,34 @@ def build_query(text: str, options: SearchOptions) -> str:
         The constructed Twitter search query.
     """
     if exact_phrases := options.get('exact_phrases'):
-        text += ' ' + ' '.join(
-            [f'"{i}"' for i in exact_phrases]
-        )
+        text += ' ' + ' '.join([f'"{i}"' for i in exact_phrases])
 
     if or_keywords := options.get('or_keywords'):
         text += ' ' + ' OR '.join(or_keywords)
 
     if exclude_keywords := options.get('exclude_keywords'):
-        text += ' ' + ' '.join(
-            [f'-"{i}"' for i in exclude_keywords]
-        )
+        text += ' ' + ' '.join([f'-"{i}"' for i in exclude_keywords])
 
     if hashtags := options.get('hashtags'):
-        text += ' ' + ' '.join(
-            [f'#{i}' for i in hashtags]
-        )
+        text += ' ' + ' '.join([f'#{i}' for i in hashtags])
 
     if from_user := options.get('from_user'):
-        text +=f' from:{from_user}'
+        text += f' from:{from_user}'
 
     if to_user := options.get('to_user'):
         text += f' to:{to_user}'
 
     if mentioned_users := options.get('mentioned_users'):
-        text += ' ' + ' '.join(
-            [f'@{i}' for i in mentioned_users]
-        )
+        text += ' ' + ' '.join([f'@{i}' for i in mentioned_users])
 
     if filters := options.get('filters'):
-        text += ' ' + ' '.join(
-            [f'filter:{i}' for i in filters]
-        )
+        text += ' ' + ' '.join([f'filter:{i}' for i in filters])
 
     if exclude_filters := options.get('exclude_filters'):
-        text += ' ' + ' '.join(
-            [f'-filter:{i}' for i in exclude_filters]
-        )
+        text += ' ' + ' '.join([f'-filter:{i}' for i in exclude_filters])
 
     if urls := options.get('urls'):
-        text += ' ' + ' '.join(
-            [f'url:{i}' for i in urls]
-        )
+        text += ' ' + ' '.join([f'url:{i}' for i in urls])
 
     if since := options.get('since'):
         text += f' since:{since}'

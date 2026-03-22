@@ -25,9 +25,8 @@ class Notification:
     from_user : :class:`.User`
         The user who triggered the notification.
     """
-    def __init__(
-        self, client: Client, data: dict, tweet: Tweet, from_user: User
-    ) -> None:
+
+    def __init__(self, client: Client, data: dict, tweet: Tweet, from_user: User) -> None:
         self._client = client
         self.tweet = tweet
         self.from_user = from_user

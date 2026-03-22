@@ -11,14 +11,11 @@ PASSWORD = ...
 
 client = Client('en-US')
 
+
 async def main():
     # Asynchronous client methods are coroutines and
     # must be called using `await`.
-    await client.login(
-        auth_info_1=USERNAME,
-        auth_info_2=EMAIL,
-        password=PASSWORD
-    )
+    await client.login(auth_info_1=USERNAME, auth_info_2=EMAIL, password=PASSWORD)
 
     ###########################################
 
@@ -50,7 +47,7 @@ async def main():
         f'name: {user.name}',
         f'followers: {user.followers_count}',
         f'tweets count: {user.statuses_count}',
-        sep='\n'
+        sep='\n',
     )
 
     # Follow user
@@ -90,7 +87,7 @@ async def main():
         f'text {tweet.text}',
         f'favorite count: {tweet.favorite_count}',
         f'media: {tweet.media}',
-        sep='\n'
+        sep='\n',
     )
 
     # Favorite tweet
@@ -112,16 +109,14 @@ async def main():
     MEDIA_IDS = [
         await client.upload_media('./media1.png', 0),
         await client.upload_media('./media2.png', 1),
-        await client.upload_media('./media3.png', 2)
+        await client.upload_media('./media3.png', 2),
     ]
 
     client.create_tweet(TWEET_TEXT, MEDIA_IDS)
 
     # Create tweet with a poll
     TWEET_TEXT = 'tweet text'
-    POLL_URI = await client.create_poll(
-        ['Option 1', 'Option 2', 'Option 3']
-    )
+    POLL_URI = await client.create_poll(['Option 1', 'Option 2', 'Option 3'])
 
     await client.create_tweet(TWEET_TEXT, poll_uri=POLL_URI)
 
@@ -133,5 +128,6 @@ async def main():
         print(trend)
 
     ###########################################
+
 
 asyncio.run(main())

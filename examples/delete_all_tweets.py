@@ -32,9 +32,7 @@ async def main():
     gather = asyncio.gather(*tasks)
     await gather
 
-    print(
-        f'Deleted {len(all_tweets)} tweets\n'
-        f'Time: {time.time() - started_time}'
-    )
+    print(f'Deleted {len(all_tweets)} tweets\nTime: {time.time() - started_time}')
+
 
 asyncio.run(main())

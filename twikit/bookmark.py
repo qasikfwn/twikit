@@ -21,6 +21,7 @@ class BookmarkFolder:
     media : :class:`str`
         Icon image data.
     """
+
     def __init__(self, client: Client, data: dict) -> None:
         self._client = client
 
@@ -32,9 +33,7 @@ class BookmarkFolder:
         """
         Retrieves tweets from the folder.
         """
-        return await self._client.get_bookmarks(
-            cursor=cursor, folder_id=self.id
-        )
+        return await self._client.get_bookmarks(cursor=cursor, folder_id=self.id)
 
     async def edit(self, name: str) -> BookmarkFolder:
         """

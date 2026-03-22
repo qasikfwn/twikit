@@ -139,12 +139,8 @@ class Tweet:
             retweeted_tweet = legacy.pop('retweeted_status_result')['result']
             if 'tweet' in retweeted_tweet:
                 retweeted_tweet = retweeted_tweet['tweet']
-            retweeted_user = User(
-                client, retweeted_tweet['core']['user_results']['result']
-            )
-            self.retweeted_tweet: Tweet = Tweet(
-                client, retweeted_tweet, retweeted_user
-            )
+            retweeted_user = User(client, retweeted_tweet['core']['user_results']['result'])
+            self.retweeted_tweet: Tweet = Tweet(client, retweeted_tweet, retweeted_user)
         else:
             self.retweeted_tweet = None
 
@@ -162,9 +158,7 @@ class Tweet:
             self.urls: list = legacy['entities'].get('urls')
             hashtags = legacy['entities'].get('hashtags', [])
 
-        self.hashtags: list[str] = [
-            i['text'] for i in hashtags
-        ]
+        self.hashtags: list[str] = [i['text'] for i in hashtags]
 
         self.community_note = None
         if 'birdwatch_pivot' in data:
@@ -172,14 +166,14 @@ class Tweet:
             if 'note' in community_note_data:
                 self.community_note = {
                     'id': community_note_data['note']['rest_id'],
-                    'text': community_note_data['subtitle']['text']
+                    'text': community_note_data['subtitle']['text'],
                 }
 
         if (
-            'card' in data and
-            'legacy' in data['card'] and
-            'name' in data['card']['legacy'] and
-            data['card']['legacy']['name'].startswith('poll')
+            'card' in data
+            and 'legacy' in data['card']
+            and 'name' in data['card']['legacy']
+            and data['card']['legacy']['name'].startswith('poll')
         ):
             self._poll_data = data['card']
         else:
@@ -189,27 +183,26 @@ class Tweet:
         self.thumbnail_title = None
         self.has_card = 'card' in data
         if (
-            'card' in data and
-            'legacy' in data['card'] and
-            'binding_values' in data['card']['legacy']
+            'card' in data
+            and 'legacy' in data['card']
+            and 'binding_values' in data['card']['legacy']
         ):
             card_data = data['card']['legacy']['binding_values']
 
             if isinstance(card_data, list):
-                binding_values = {
-                    i.get('key'): i.get('value')
-                    for i in card_data
-                }
+                binding_values = {i.get('key'): i.get('value') for i in card_data}
 
             if 'title' in binding_values and 'string_value' in binding_values['title']:
                 self.thumbnail_title = binding_values['title']['string_value']
 
             if (
-                'thumbnail_image_original' in binding_values and
-                'image_value' in binding_values['thumbnail_image_original'] and
-                'url' in binding_values['thumbnail_image_original']['image_value']
+                'thumbnail_image_original' in binding_values
+                and 'image_value' in binding_values['thumbnail_image_original']
+                and 'url' in binding_values['thumbnail_image_original']['image_value']
             ):
-                self.thumbnail_url = binding_values['thumbnail_image_original']['image_value']['url']
+                self.thumbnail_url = binding_values['thumbnail_image_original']['image_value'][
+                    'url'
+                ]
 
     @property
     def media(self) -> list[MEDIA_TYPE]:
