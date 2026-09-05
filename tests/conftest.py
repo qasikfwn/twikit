@@ -1,11 +1,12 @@
+from dataclasses import dataclass
 from pathlib import Path
+
 import dotenv
-import twikit
 import httpx
 import respx
 from respx.patterns import M
-from dataclasses import dataclass
 
+import twikit
 
 TESTS = Path('tests')
 
