@@ -801,7 +801,7 @@ requires-dist = [
     { name = "m3u8" },
     { name = "pyotp" },
     { name = "webvtt-py" },
-    { name = "xclienttransaction", specifier = ">=1.0.2" },
+    { name = "xclienttransaction", specifier = ">=1.0.3" },
 ]
 
 [package.metadata.requires-dev]
@@ -890,12 +890,12 @@ wheels = [
 
 [[package]]
 name = "xclienttransaction"
-version = "1.0.2"
+version = "1.0.3"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "beautifulsoup4" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/af/1e/18fbba3658a215cfad22827625486d2b496873e2a82b1013f6a89455031b/xclienttransaction-1.0.2.tar.gz", hash = "sha256:a9a7f9f1e7215e7317398b1659cf1c76a631fd87d20a254511f8008dceb4bb8f", size = 10623, upload-time = "2026-03-18T15:28:13.379Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/1b/11/6f5a55df6d464fe6f839fe96c3863fa2338005ed8e83e89b0a9db5716b5a/xclienttransaction-1.0.3.tar.gz", hash = "sha256:1eeb5d48cec6a224189bbd8a6021c40486fa3aff650478672bccf82b3436cedc", size = 10609, upload-time = "2026-06-26T10:47:39.664Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/d4/57/7cd813ecbbf685bcd55d259f8bb66550d51c3414870e8c5c7274809d6bed/xclienttransaction-1.0.2-py3-none-any.whl", hash = "sha256:66251554f02472cd0fb3a33bc6468cfeb740949754ddc07dbe4164e439ac8613", size = 10774, upload-time = "2026-03-18T15:28:11.994Z" },
+    { url = "https://files.pythonhosted.org/packages/fa/a1/be735112ebe49916065e6f80017b93e92fc8880789c3f4f17380db7f531a/xclienttransaction-1.0.3-py3-none-any.whl", hash = "sha256:f73dd2a4b6856f98fa45f0cd26c9a0fdc0b2ceba0e79b5523cdf8aac7efc59fe", size = 10778, upload-time = "2026-06-26T10:47:38.401Z" },
 ]
