@@ -1809,7 +1809,7 @@ class Client:
     async def get_user_tweets(
         self,
         user_id: str,
-        tweet_type: Literal['Tweets', 'Replies', 'Media', 'Likes'],
+        tweet_type: Literal['Tweets', 'Replies', 'Media', 'Photos', 'Videos', 'Likes'],
         count: int = 40,
         cursor: str | None = None,
     ) -> Result[Tweet]:
@@ -1872,6 +1872,8 @@ class Client:
             'Tweets': self.gql.user_tweets,
             'Replies': self.gql.user_tweets_and_replies,
             'Media': self.gql.user_media,
+            'Photos': self.gql.user_photos,
+            'Videos': self.gql.user_videos,
             'Likes': self.gql.user_likes,
         }[tweet_type]
         response, _ = await f(user_id, count, cursor)
@@ -1895,7 +1897,9 @@ class Client:
         for item in items:
             entry_id = item['entryId']
 
-            if not entry_id.startswith(('tweet', 'profile-conversation', 'profile-grid')):
+            if not entry_id.startswith(
+                ('tweet', 'profile-conversation', 'profile-grid', 'profile-photo-grid')
+            ):
                 continue
 
             if entry_id.startswith('profile-conversation'):

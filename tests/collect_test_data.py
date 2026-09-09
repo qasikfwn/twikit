@@ -40,6 +40,8 @@ async def main() -> None:
     )
     await client.gql.user_tweets(user_id=conftest.TEST_USER_2.rest_id, count=20, cursor=None)
     await client.gql.tweet_detail(tweet_id=conftest.TEST_TWEET_2.rest_id, cursor=None)
+    await client.gql.user_videos(user_id=conftest.TEST_USER_3.rest_id, count=20, cursor=None)
+    await client.gql.user_photos(user_id=conftest.TEST_USER_3.rest_id, count=20, cursor=None)
 
 
 asyncio.run(main())

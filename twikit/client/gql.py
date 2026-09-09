@@ -50,6 +50,8 @@ class Endpoint:
     USER_TWEETS = url('QWF3SzpHmykQHsQMixG0cg/UserTweets')
     USER_TWEETS_AND_REPLIES = url('vMkJyzx1wdmvOeeNG0n6Wg/UserTweetsAndReplies')
     USER_MEDIA = url('2tLOJWwGuCTytDrGBg8VwQ/UserMedia')
+    USER_PHOTO_TIMELINE = url('XIHPPDFf0sv_vq-jGY2R6A/UserPhotoTimeline')
+    USER_VIDEO_TIMELINE = url('nQtJBz_PX3Dr8Erk3oyhuA/UserVideoTimeline')
     USER_LIKES = url('IohM3gxQHfvWePH5E3KuNA/Likes')
     USER_HIGHLIGHTS_TWEETS = url('tHFm_XZc_NNi-CfUThwbNw/UserHighlightsTweets')
     HOME_TIMELINE = url('-X_hcgQzmHGl29-UXxz4sw/HomeTimeline')
@@ -310,6 +312,12 @@ class GQLClient:
 
     async def user_media(self, user_id: str, count: int, cursor: str | None):
         return await self._get_user_tweets(user_id, count, cursor, Endpoint.USER_MEDIA)
+
+    async def user_photos(self, user_id: str, count: int, cursor: str | None):
+        return await self._get_user_tweets(user_id, count, cursor, Endpoint.USER_PHOTO_TIMELINE)
+
+    async def user_videos(self, user_id: str, count: int, cursor: str | None):
+        return await self._get_user_tweets(user_id, count, cursor, Endpoint.USER_VIDEO_TIMELINE)
 
     async def user_likes(self, user_id: str, count: int, cursor: str | None):
         return await self._get_user_tweets(user_id, count, cursor, Endpoint.USER_LIKES)

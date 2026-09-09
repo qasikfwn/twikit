@@ -119,3 +119,25 @@ async def get_user_by_id(cookies: str) -> None:
     assert user.id == TEST_USER_1.rest_id
     assert router_x['UserByRestId'].called
     assert router_x['UserByRestId'].call_count == 1
+
+
+async def get_user_videos(cookies: str) -> None:
+    client = get_client(cookies)
+    video_tweets = await client.get_user_tweets(TEST_USER_3.rest_id, 'Videos', count=20)
+    tweets = list(video_tweets)
+    assert len(tweets) > 0
+    for tweet in tweets:
+        assert len(tweet.media) > 0
+        for media in tweet.media:
+            assert media.type == 'video'
+
+
+async def get_user_photos(cookies: str) -> None:
+    client = get_client(cookies)
+    photo_tweets = await client.get_user_tweets(TEST_USER_3.rest_id, 'Photos', count=20)
+    tweets = list(photo_tweets)
+    assert len(tweets) > 0
+    for tweet in tweets:
+        assert len(tweet.media) > 0
+        for media in tweet.media:
+            assert media.type == 'photo'

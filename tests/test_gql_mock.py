@@ -17,3 +17,15 @@ async def test_get_user_by_screen_name() -> None:
 @conftest.router_x
 async def test_get_user_by_id() -> None:
     await conftest.get_user_by_id(cookies=conftest.DUMMY_COOKIES)
+
+
+@conftest.router_twimg
+@conftest.router_x
+async def test_get_user_videos() -> None:
+    await conftest.get_user_videos(cookies=conftest.DUMMY_COOKIES)
+
+
+@conftest.router_twimg
+@conftest.router_x
+async def test_get_user_photos() -> None:
+    await conftest.get_user_photos(cookies=conftest.DUMMY_COOKIES)
