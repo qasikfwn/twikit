@@ -1,17 +1,12 @@
 from dataclasses import dataclass
 from pathlib import Path
-
 import dotenv
-import httpx
-import respx
-from respx.patterns import M
 
 import twikit
 
 TESTS = Path('tests')
 
 TEST_DATA = TESTS / 'test_data'
-DUMMY_COOKIES = str(TESTS / 'dummy_cookies.txt')  # actually JSON
 X_FILES = TEST_DATA / 'x.com'
 TWIMG_FILES = TEST_DATA / 'abs.twimg.com'
 
@@ -31,31 +26,6 @@ if not COOKIEJAR:
 USER_AGENT = config.get('USER_AGENT', None)
 if not USER_AGENT:
     raise ValueError('USER_AGENT is None')
-
-
-def make_routes(router: respx.Router, dir: Path, host: str) -> None:
-    """Create a route for each file in the directory."""
-    for file in dir.rglob('*'):
-        if file.is_dir():
-            continue
-        rel_file = file.relative_to(dir)
-
-        # special case where path is "/"
-        if rel_file.name == '_home':
-            path = '/'
-        else:
-            path = rel_file.as_posix()
-
-        response = httpx.Response(200, content=file.read_bytes())
-        pat = M(host=host, path=path)
-        router.route(pat, name=file.name).mock(return_value=response)
-
-
-router_x = respx.mock(base_url=TWITTER_URL, assert_all_mocked=True, assert_all_called=False)
-router_twimg = respx.mock(base_url=ABS_TWIMG_URL, assert_all_mocked=True, assert_all_called=False)
-
-make_routes(router_twimg, TWIMG_FILES, ABS_TWIMG_DOMAIN)
-make_routes(router_x, X_FILES, TWITTER_DOMAIN)
 
 
 @dataclass
@@ -85,59 +55,73 @@ TEST_TWEET_3 = TestTweet(TEST_USER_3, '2027866402929918312', 'aaa')
 TEST_TWEET_4 = TestTweet(TEST_USER_3, '2027760707362500970', 'aaa')
 
 
-def get_client(cookies_path: str) -> twikit.Client:
+def get_client() -> twikit.Client:
     """Build a twikit Client with the given cookies file."""
-    client = twikit.Client()
+    client = twikit.Client(user_agent=USER_AGENT)
     client.http.cookies.clear()
-    client.load_cookies(cookies_path)
+    client.load_cookies(COOKIEJAR)
     return client
 
 
-async def get_tweet_by_id(cookies: str) -> None:
-    client = get_client(cookies)
+async def get_tweet_by_id() -> None:
+    client = get_client()
     tweet = await client.get_tweet_by_id(TEST_TWEET_2.rest_id)
     assert tweet.id == TEST_TWEET_2.rest_id
     assert tweet.text == TEST_TWEET_2.text
     assert tweet.user.id == TEST_TWEET_2.user.rest_id
-    assert router_x['TweetDetail'].called
-    assert router_x['TweetDetail'].call_count == 1
 
 
-async def get_user_by_screen_name(cookies: str) -> None:
-    client = get_client(cookies)
+async def get_user_by_screen_name() -> None:
+    client = get_client()
     user = await client.get_user_by_screen_name(TEST_USER_1.screen_name)
     assert user.screen_name == TEST_USER_1.screen_name
     assert user.id == TEST_USER_1.rest_id
-    assert router_x['UserByScreenName'].called
-    assert router_x['UserByScreenName'].call_count == 1
 
 
-async def get_user_by_id(cookies: str) -> None:
-    client = get_client(cookies)
+async def get_user_by_id() -> None:
+    client = get_client()
     user = await client.get_user_by_id(TEST_USER_1.rest_id)
     assert user.screen_name == TEST_USER_1.screen_name
     assert user.id == TEST_USER_1.rest_id
-    assert router_x['UserByRestId'].called
-    assert router_x['UserByRestId'].call_count == 1
 
 
-async def get_user_videos(cookies: str) -> None:
-    client = get_client(cookies)
+async def get_user_videos() -> None:
+    seen_tweets: set[str] = set()
+
+    def read_tweets(tweets: list[twikit.Tweet]):
+        assert len(tweets) > 1
+        for tweet in tweets:
+            assert tweet.id not in seen_tweets
+            seen_tweets.add(tweet.id)
+            assert len(tweet.media) > 0
+            for media in tweet.media:
+                assert media.type == 'video'
+
+    client = get_client()
+    # first page
     video_tweets = await client.get_user_tweets(TEST_USER_3.rest_id, 'Videos', count=20)
-    tweets = list(video_tweets)
-    assert len(tweets) > 0
-    for tweet in tweets:
-        assert len(tweet.media) > 0
-        for media in tweet.media:
-            assert media.type == 'video'
+    read_tweets(list(video_tweets))
+    # second page
+    video_tweets = await video_tweets.next()
+    read_tweets(list(video_tweets))
 
 
-async def get_user_photos(cookies: str) -> None:
-    client = get_client(cookies)
+async def get_user_photos() -> None:
+    seen_tweets: set[str] = set()
+
+    def read_tweets(tweets: list[twikit.Tweet]):
+        assert len(tweets) > 1
+        for tweet in tweets:
+            assert tweet.id not in seen_tweets
+            seen_tweets.add(tweet.id)
+            assert len(tweet.media) > 0
+            for media in tweet.media:
+                assert media.type == 'photo'
+
+    client = get_client()
+    # first page
     photo_tweets = await client.get_user_tweets(TEST_USER_3.rest_id, 'Photos', count=20)
-    tweets = list(photo_tweets)
-    assert len(tweets) > 0
-    for tweet in tweets:
-        assert len(tweet.media) > 0
-        for media in tweet.media:
-            assert media.type == 'photo'
+    read_tweets(list(photo_tweets))
+    # second page
+    photo_tweets = await photo_tweets.next()
+    read_tweets(list(photo_tweets))

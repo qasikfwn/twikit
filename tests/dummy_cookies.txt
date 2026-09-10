@@ -1,1 +1,0 @@
-{"cookie1": "abcd", "cookie2": "efgh"}
