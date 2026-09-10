@@ -138,7 +138,10 @@ class User:
         self.location: str = data['location']['location']
         self.description: str = data['profile_bio']['description']
         self.description_urls: list = data['profile_bio']['entities']['description'].get('urls', [])
-        self.urls: list = data['profile_bio']['entities']['url'].get('urls', [])
+        if url := data['profile_bio']['entities'].get('url'):
+            self.urls: list = url.get('urls', [])
+        else:
+            self.urls: list = []
         self.pinned_tweet_ids: list[str] = data['pinned_items']
         self.is_blue_verified: bool = data['is_blue_verified']
         self.verified: bool = data['verification']['verified']
