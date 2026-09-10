@@ -1918,7 +1918,10 @@ class Client:
                 case 'TimelineAddEntries':
                     if entries := instruction.get('entries'):
                         if t == TweetType.PHOTOS:
-                            items = find_dict(entries, 'items', True)[0]
+                            # not present when we reach the end of a timeline
+                            if maybe_items := find_dict(entries, 'items', True):
+                                items = maybe_items[0]
+                                break
                         elif t == TweetType.VIDEOS:
                             items = entries
                         break
