@@ -1910,17 +1910,24 @@ class Client:
 
         for instruction in instructions:
             instr_t = instruction.get('type')
-            if instr_t in ('TimelineClearCache', 'TimelineTerminateTimeline'):
-                continue
-            if instr_t == 'TimelineAddEntries':
-                if t == TweetType.PHOTOS:
+            match instr_t:
+                case 'TimelineClearCache':
+                    continue
+                case 'TimelineTerminateTimeline':
+                    continue
+                case 'TimelineAddEntries':
+                    if entries := instruction.get('entries'):
+                        if t == TweetType.PHOTOS:
+                            items = find_dict(entries, 'items', True)[0]
+                        elif t == TweetType.VIDEOS:
+                            items = entries
+                        break
+                case 'TimelineAddToModule':
                     if module_items := instruction.get('moduleItems'):
                         items = module_items
                         break
-                elif t == TweetType.VIDEOS:
-                    if entries := instruction.get('entries'):
-                        items = entries
-                        break
+                case _:
+                    pass
 
         results: list[Tweet] = []
         for item in items:
