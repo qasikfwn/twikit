@@ -1908,13 +1908,21 @@ class Client:
         next_cursor = items[-1]['content']['value']
         previous_cursor = items[-2]['content']['value']
 
-        if t == TweetType.MEDIA:
-            if cursor is None:
-                items = items[0]['content']['items']
-            else:
-                items = instructions[0]['moduleItems']
+        for instruction in instructions:
+            instr_t = instruction.get('type')
+            if instr_t in ('TimelineClearCache', 'TimelineTerminateTimeline'):
+                continue
+            if instr_t == 'TimelineAddEntries':
+                if t == TweetType.PHOTOS:
+                    if module_items := instruction.get('moduleItems'):
+                        items = module_items
+                        break
+                elif t == TweetType.VIDEOS:
+                    if entries := instruction.get('entries'):
+                        items = entries
+                        break
 
-        results = []
+        results: list[Tweet] = []
         for item in items:
             entry_id = item['entryId']
 
