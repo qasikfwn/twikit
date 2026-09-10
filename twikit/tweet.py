@@ -546,7 +546,7 @@ class Tweet:
         return not self == __value
 
 
-def tweet_from_data(client: Client, data: dict) -> Tweet:
+def tweet_from_data(client: Client, data: dict) -> Tweet | None:
     ":meta private:"
     tweet_data_ = find_dict(data, 'result', True)
     if not tweet_data_:
