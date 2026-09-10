@@ -4,7 +4,7 @@ import asyncio
 import io
 import json
 import os
-
+from enum import StrEnum
 import warnings
 from functools import partial
 from typing import Any, AsyncGenerator, Literal
@@ -59,6 +59,21 @@ from ..utils import (
 from ..client_transaction import IClientTransaction
 from .gql import GQLClient
 from .v11 import V11Client
+
+
+class ProductType(StrEnum):
+    TOP = 'Top'
+    LATEST = 'Latest'
+    MEDIA = 'Media'
+
+
+class TweetType(StrEnum):
+    TWEETS = 'Tweets'
+    REPLIES = 'Replies'
+    MEDIA = 'Media'
+    PHOTOS = 'Photos'
+    VIDEOS = 'Videos'
+    LIKES = 'Likes'
 
 
 class Client:
@@ -671,7 +686,7 @@ class Client:
     async def search_tweet(
         self,
         query: str,
-        product: Literal['Top', 'Latest', 'Media'],
+        product: Literal['Top', 'Latest', 'Media'] | ProductType,
         count: int = 20,
         cursor: str | None = None,
     ) -> Result[Tweet]:
@@ -717,15 +732,15 @@ class Client:
         >>> # Retrieve previous tweets
         >>> previous_tweets = await tweets.previous()
         """
-        product = product.capitalize()
+        prod = ProductType(product.capitalize())
 
-        response, _ = await self.gql.search_timeline(query, product, count, cursor)
+        response, _ = await self.gql.search_timeline(query, prod, count, cursor)
         instructions = find_dict(response, 'instructions', find_one=True)
         if not instructions:
             return Result([])
         instructions = instructions[0]
 
-        if product == 'Media' and cursor is not None:
+        if prod == ProductType.MEDIA and cursor is not None:
             items = find_dict(instructions, 'moduleItems', find_one=True)[0]
         else:
             items_ = find_dict(instructions, 'entries', find_one=True)
@@ -733,7 +748,7 @@ class Client:
                 items = items_[0]
             else:
                 items = []
-            if product == 'Media':
+            if prod == ProductType.MEDIA:
                 if 'items' in items[0]['content']:
                     items = items[0]['content']['items']
                 else:
@@ -760,7 +775,7 @@ class Client:
                 results.append(tweet)
 
         if next_cursor is None:
-            if product == 'Media':
+            if prod == ProductType.MEDIA:
                 entries = find_dict(instructions, 'entries', find_one=True)[0]
                 next_cursor = entries[-1]['content']['value']
                 previous_cursor = entries[-2]['content']['value']
@@ -770,9 +785,9 @@ class Client:
 
         return Result(
             results,
-            partial(self.search_tweet, query, product, count, next_cursor),
+            partial(self.search_tweet, query, prod, count, next_cursor),
             next_cursor,
-            partial(self.search_tweet, query, product, count, previous_cursor),
+            partial(self.search_tweet, query, prod, count, previous_cursor),
             previous_cursor,
         )
 
@@ -1809,7 +1824,7 @@ class Client:
     async def get_user_tweets(
         self,
         user_id: str,
-        tweet_type: Literal['Tweets', 'Replies', 'Media', 'Photos', 'Videos', 'Likes'],
+        tweet_type: Literal['Tweets', 'Replies', 'Media', 'Photos', 'Videos', 'Likes'] | TweetType,
         count: int = 40,
         cursor: str | None = None,
     ) -> Result[Tweet]:
@@ -1867,15 +1882,21 @@ class Client:
         --------
         .get_user_by_screen_name
         """
-        tweet_type = tweet_type.capitalize()
-        f = {
-            'Tweets': self.gql.user_tweets,
-            'Replies': self.gql.user_tweets_and_replies,
-            'Media': self.gql.user_media,
-            'Photos': self.gql.user_photos,
-            'Videos': self.gql.user_videos,
-            'Likes': self.gql.user_likes,
-        }[tweet_type]
+        t = TweetType(tweet_type.capitalize())
+        match t:
+            case TweetType.TWEETS:
+                f = self.gql.user_tweets
+            case TweetType.REPLIES:
+                f = self.gql.user_tweets_and_replies
+            case TweetType.MEDIA:
+                f = self.gql.user_media
+            case TweetType.PHOTOS:
+                f = self.gql.user_photos
+            case TweetType.VIDEOS:
+                f = self.gql.user_videos
+            case TweetType.LIKES:
+                f = self.gql.user_likes
+
         response, _ = await f(user_id, count, cursor)
 
         instructions_ = find_dict(response, 'instructions', True)
@@ -1887,7 +1908,7 @@ class Client:
         next_cursor = items[-1]['content']['value']
         previous_cursor = items[-2]['content']['value']
 
-        if tweet_type == 'Media':
+        if t == TweetType.MEDIA:
             if cursor is None:
                 items = items[0]['content']['items']
             else:
