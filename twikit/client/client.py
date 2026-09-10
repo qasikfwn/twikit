@@ -1904,9 +1904,9 @@ class Client:
             return Result([])
         instructions = instructions_[0]
 
-        items = instructions[-1]['entries']
-        next_cursor = items[-1]['content']['value']
-        previous_cursor = items[-2]['content']['value']
+        items: list = []
+        next_cursor: str | None = None
+        previous_cursor: str | None = None
 
         for instruction in instructions:
             instr_t = instruction.get('type')
@@ -1917,18 +1917,22 @@ class Client:
                     continue
                 case 'TimelineAddEntries':
                     if entries := instruction.get('entries'):
+                        # get cursors
+                        for entry in entries:
+                            if entry['entryId'].startswith('cursor-top'):
+                                previous_cursor = entry['content']['value']
+                            elif entry['entryId'].startswith('cursor-bottom'):
+                                next_cursor = entry['content']['value']
+
                         if t == TweetType.PHOTOS:
                             # not present when we reach the end of a timeline
                             if maybe_items := find_dict(entries, 'items', True):
                                 items = maybe_items[0]
-                                break
                         elif t == TweetType.VIDEOS:
                             items = entries
-                        break
                 case 'TimelineAddToModule':
                     if module_items := instruction.get('moduleItems'):
                         items = module_items
-                        break
                 case _:
                     pass
 
