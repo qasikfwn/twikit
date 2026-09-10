@@ -162,7 +162,7 @@ class User:
 
     async def get_tweets(
         self,
-        tweet_type: Literal['Tweets', 'Replies', 'Media', 'Likes'],
+        tweet_type: Literal['Tweets', 'Replies', 'Media', 'Photos', 'Videos', 'Likes'],
         count: int = 40,
     ) -> Result[Tweet]:
         """
